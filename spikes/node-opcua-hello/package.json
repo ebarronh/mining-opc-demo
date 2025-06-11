@@ -1,0 +1,19 @@
+{
+  "name": "node-opcua-hello",
+  "version": "1.0.0",
+  "description": "Minimal OPC UA server spike for MineSensors mining demo",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "node-opcua": "^2.116.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "keywords": ["opcua", "mining", "demo", "spike"],
+  "author": "Mining Demo Team",
+  "license": "MIT"
+}

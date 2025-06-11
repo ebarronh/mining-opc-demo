@@ -1,0 +1,61 @@
+{
+  "name": "mining-opc-demo",
+  "version": "1.0.0",
+  "description": "MineSensors OPC UA Mining Integration Demo - Standards-based real-time ore intelligence platform",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --parallel --filter frontend --filter backend dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "dev:backend": "pnpm --filter backend dev",
+    "build": "pnpm --filter backend build && pnpm --filter frontend build",
+    "build:frontend": "pnpm --filter frontend build",
+    "build:backend": "pnpm --filter backend build",
+    "start": "pnpm --parallel --filter frontend --filter backend start",
+    "test": "pnpm --recursive test",
+    "test:watch": "pnpm --recursive run test:watch",
+    "test:coverage": "pnpm --recursive run test -- --coverage",
+    "lint": "pnpm --recursive lint",
+    "lint:fix": "pnpm --recursive run lint -- --fix",
+    "format": "pnpm --recursive format",
+    "format:check": "prettier --check \"**/*.{js,ts,tsx,json,md}\"",
+    "type-check": "pnpm --recursive run type-check",
+    "clean": "pnpm --recursive clean && rm -rf node_modules",
+    "clean:deps": "pnpm --recursive exec rm -rf node_modules && rm -rf node_modules",
+    "reset": "pnpm clean:deps && pnpm install",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:clean": "docker-compose down -v --rmi all",
+    "prepare": "husky",
+    "validate": "pnpm lint && pnpm type-check && pnpm test",
+    "demo:start": "pnpm docker:up && echo 'Demo available at http://localhost:3000'",
+    "demo:stop": "pnpm docker:down"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0",
+  "keywords": [
+    "mining",
+    "opcua",
+    "opc-ua",
+    "real-time",
+    "grade-control",
+    "isa-95",
+    "industrial-automation"
+  ],
+  "author": "Mining Demo Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^8.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.0.0"
+  }
+}

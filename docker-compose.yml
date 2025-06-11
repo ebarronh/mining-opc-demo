@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - "3001:3001"  # REST API
+      - "4840:4840"  # OPC UA Server
+      - "4841:4841"  # WebSocket Bridge
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - OPC_UA_PORT=4840
+      - WEBSOCKET_PORT=4841
+    volumes:
+      - ./backend/src:/app/src
+      - /app/node_modules
+    command: npm run dev
+    networks:
+      - mining-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - "3000:3000"  # Next.js Development Server
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_APP_NAME=MineSensors OPC UA Mining Demo
+      - NEXT_PUBLIC_API_URL=http://backend:3001
+      - NEXT_PUBLIC_WS_URL=ws://backend:4841
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
+    depends_on:
+      - backend
+    networks:
+      - mining-network
+
+networks:
+  mining-network:
+    driver: bridge
+
+volumes:
+  backend_node_modules:
+  frontend_node_modules:
