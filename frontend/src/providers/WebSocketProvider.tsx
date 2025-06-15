@@ -26,8 +26,8 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
     onClose: () => {
       console.log('🔌 WebSocket disconnected from mining demo backend')
     },
-    onError: (error) => {
-      console.error('❌ WebSocket error:', error)
+    onError: (event) => {
+      console.log('❌ WebSocket connection error')
     },
     onMessage: (message: WebSocketMessage) => {
       // Handle specific message types for mining demo

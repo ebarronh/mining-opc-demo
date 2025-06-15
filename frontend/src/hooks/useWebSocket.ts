@@ -126,17 +126,21 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
       }
 
       ws.onclose = (event) => {
-        console.log('WebSocket connection closed:', event.code, event.reason)
+        // Only log if it's not a normal closure
+        if (event.code !== 1000) {
+          console.log('WebSocket connection closed:', event.code, event.reason || 'No reason provided')
+        }
         setState('disconnected')
         wsRef.current = null
+        globalWsRef.current = null
         onClose?.()
 
         // Attempt reconnection if enabled and not manually disconnected
-        if (shouldReconnectRef.current) {
+        if (shouldReconnectRef.current && event.code !== 1000) {
           setConnectionAttempts(prevAttempts => {
             if (prevAttempts < reconnectAttempts) {
               const delay = reconnectInterval * Math.pow(2, prevAttempts) // Exponential backoff
-              console.log(`Attempting to reconnect in ${delay}ms (attempt ${prevAttempts + 1}/${reconnectAttempts})`)
+              console.log(`Reconnecting in ${delay}ms (attempt ${prevAttempts + 1}/${reconnectAttempts})`)
               
               reconnectTimeoutRef.current = setTimeout(() => {
                 connect()
@@ -144,7 +148,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
               
               return prevAttempts + 1
             } else {
-              console.warn('Max reconnection attempts reached')
+              console.warn('Max reconnection attempts reached. Please check if the backend is running.')
               setState('error')
               return prevAttempts
             }
@@ -152,10 +156,13 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
         }
       }
 
-      ws.onerror = (error) => {
-        console.error('WebSocket error:', error)
+      ws.onerror = (event) => {
+        // WebSocket errors don't provide much detail, but we can infer from readyState
+        if (ws.readyState === WebSocket.CONNECTING) {
+          console.warn('WebSocket failed to connect to:', WS_URL)
+        }
         setState('error')
-        onError?.(error)
+        onError?.(event)
       }
 
       ws.onmessage = (event) => {
