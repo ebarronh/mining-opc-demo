@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { BarChart3, Globe, Link as LinkIcon, CheckCircle, Pickaxe, AlertTriangle } from 'lucide-react'
 import { useSystemStatus } from '@/hooks/useSystemStatus'
+import { HelpModeToggle } from '@/providers/HelpModeProvider'
+import { HelpTarget } from '../educational/HelpTarget'
 
 interface NavigationTab {
   id: string
@@ -121,8 +123,11 @@ export function MainNavigation() {
             </div>
           </Link>
           
-          {/* Status Indicator */}
-          {getSystemStatusIndicator()}
+          {/* Status Indicator and Help Toggle */}
+          <div className="flex items-center space-x-4">
+            <HelpModeToggle />
+            {getSystemStatusIndicator()}
+          </div>
         </div>
 
         {/* Navigation Tabs */}

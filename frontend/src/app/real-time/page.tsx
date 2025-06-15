@@ -7,6 +7,8 @@ import { WebSocketStatus } from '@/components/websocket/WebSocketStatus';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { Box, Activity, MapPin, Thermometer, BarChart3, Eye, EyeOff, Tag } from 'lucide-react';
 import type { EquipmentPosition, GradeData, EquipmentPositionsMessage, GradeDataMessage } from '@/types/websocket';
+import { HelpTarget } from '@/components/educational/HelpTarget';
+import { Tooltip } from '@/components/educational/Tooltip';
 
 // Dynamically import Three.js components to avoid SSR issues
 const MineScene = dynamic(() => import('@/components/three/MineScene'), { 
@@ -297,7 +299,18 @@ export default function RealTimePage() {
           {/* Grade Statistics */}
           {gradeData && (
             <div className="bg-slate-800 border border-slate-600 rounded-xl p-4">
-              <h3 className="text-sm font-semibold text-white mb-3">Grade Statistics</h3>
+              <HelpTarget
+                helpId="grade-statistics"
+                title="Grade Statistics"
+                description="Real-time ore grade measurements across the mine pit. Grade represents the concentration of valuable minerals (like gold) in the ore, measured in grams per tonne (g/t). Higher grades mean more valuable ore."
+                category="data"
+              >
+                <h3 className="text-sm font-semibold text-white mb-3">
+                  <Tooltip term="grade" showIcon={false}>
+                    Grade Statistics
+                  </Tooltip>
+                </h3>
+              </HelpTarget>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-slate-400">Average Grade:</span>

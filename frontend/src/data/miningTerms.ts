@@ -1,167 +1,232 @@
 export interface MiningTerm {
   term: string;
   definition: string;
-  category: 'equipment' | 'process' | 'material' | 'measurement' | 'opc-ua' | 'standard';
+  category: 'equipment' | 'process' | 'measurement' | 'safety' | 'geology' | 'technology';
   relatedTerms?: string[];
+  example?: string;
+  unit?: string;
 }
 
-export const miningTerms: MiningTerm[] = [
+export const miningTerms: Record<string, MiningTerm> = {
   // Equipment Terms
-  {
+  'excavator': {
     term: 'Excavator',
-    definition: 'Large machine used to dig and move earth, ore, and overburden in mining operations. Modern excavators use hydraulic systems and can weigh up to 1000 tons.',
+    definition: 'Heavy equipment used for digging and loading material in mining operations. Typically equipped with a bucket capacity of 20-80 tonnes.',
     category: 'equipment',
-    relatedTerms: ['Shovel', 'Dragline', 'Bucket']
+    relatedTerms: ['bucket', 'boom', 'hydraulic'],
+    example: 'The Komatsu PC8000 excavator can move up to 42 cubic meters per pass.'
   },
-  {
+  'haul truck': {
     term: 'Haul Truck',
-    definition: 'Off-highway dump truck designed to transport large quantities of ore or waste rock. Can carry payloads ranging from 100 to 400 tons.',
+    definition: 'Large dump truck designed to transport materials in off-road mining environments. Ultra-class trucks can carry 220-400 tonnes.',
     category: 'equipment',
-    relatedTerms: ['Dump Truck', 'Mining Truck', 'Payload']
+    relatedTerms: ['payload', 'dump body', 'CAT 797'],
+    example: 'CAT 797F haul trucks have a payload capacity of 363 tonnes.'
   },
-  {
+  'conveyor': {
     term: 'Conveyor',
-    definition: 'Continuous transport system using a belt to move bulk materials over long distances. More energy-efficient than truck haulage for certain applications.',
+    definition: 'Continuous transport system using belts to move ore and waste material efficiently over long distances.',
     category: 'equipment',
-    relatedTerms: ['Belt', 'Transfer Point', 'Throughput']
-  },
-  
-  // Process Terms
-  {
-    term: 'Grade',
-    definition: 'The concentration of valuable mineral or metal in ore, typically expressed as a percentage or grams per ton (g/t). Higher grade means more valuable content.',
-    category: 'process',
-    relatedTerms: ['Ore Grade', 'Cut-off Grade', 'Average Grade']
-  },
-  {
-    term: 'Ore',
-    definition: 'Rock containing valuable minerals in sufficient concentration to be economically extracted and processed.',
-    category: 'material',
-    relatedTerms: ['Grade', 'Mineral', 'Waste Rock']
-  },
-  {
-    term: 'Overburden',
-    definition: 'Layer of soil and rock that must be removed to access ore deposits. Also called waste rock when it contains no valuable minerals.',
-    category: 'material',
-    relatedTerms: ['Waste Rock', 'Stripping Ratio']
-  },
-  {
-    term: 'Bench',
-    definition: 'Horizontal ledge or step in an open-pit mine, typically 10-15 meters high, created by mining in horizontal layers.',
-    category: 'process',
-    relatedTerms: ['Pit', 'Level', 'Face']
+    relatedTerms: ['belt', 'throughput', 'material handling'],
+    example: 'Our main conveyor system moves 5,000 tonnes per hour to the processing plant.'
   },
   
   // Measurement Terms
-  {
-    term: 'Tonnage',
-    definition: 'Total weight of material moved or processed, measured in metric tons. Key performance indicator for mining operations.',
+  'grade': {
+    term: 'Grade',
+    definition: 'The concentration of valuable minerals or metals in ore. For gold, typically measured in grams per tonne (g/t).',
     category: 'measurement',
-    relatedTerms: ['Throughput', 'Production Rate', 'TPH']
+    relatedTerms: ['ore grade', 'cut-off grade', 'average grade'],
+    example: 'An ore grade of 5.2 g/t Au is considered medium to high grade.',
+    unit: 'g/t (grams per tonne)'
   },
-  {
-    term: 'TPH',
-    definition: 'Tons Per Hour - Standard measurement of material flow rate in mining operations. Critical for equipment sizing and production planning.',
+  'cutoff': {
+    term: 'Cutoff Grade',
+    definition: 'The minimum ore grade required for economically viable extraction. Varies by mining method and commodity prices.',
     category: 'measurement',
-    relatedTerms: ['Throughput', 'Production Rate', 'Capacity']
+    relatedTerms: ['break-even', 'economic limit', 'marginal ore'],
+    example: 'Open pit mines typically have cutoff grades of 0.5-1.0 g/t Au.',
+    unit: 'g/t'
   },
-  {
+  'payload': {
     term: 'Payload',
-    definition: 'Weight of material carried by a haul truck or other transport equipment in a single trip, excluding the vehicle weight.',
+    definition: 'The weight of material that can be carried by mining equipment, particularly haul trucks.',
     category: 'measurement',
-    relatedTerms: ['Haul Truck', 'Capacity', 'Load']
+    relatedTerms: ['capacity', 'tonnage', 'load'],
+    example: 'The truck is carrying 85% of its rated payload capacity.',
+    unit: 'tonnes'
+  },
+  'tonnage': {
+    term: 'Tonnage',
+    definition: 'The amount of material processed or moved, typically measured in tonnes per hour (t/h) or tonnes per day.',
+    category: 'measurement',
+    relatedTerms: ['throughput', 'production rate', 'capacity'],
+    example: 'The mill processes 50,000 tonnes per day.',
+    unit: 't/h or tpd'
   },
   
-  // OPC UA Terms
-  {
+  // Geology Terms
+  'ore': {
+    term: 'Ore',
+    definition: 'Rock containing valuable minerals in concentrations that make extraction economically viable.',
+    category: 'geology',
+    relatedTerms: ['grade', 'mineralization', 'deposit'],
+    example: 'High-grade gold ore contains more than 8 g/t Au.'
+  },
+  'overburden': {
+    term: 'Overburden',
+    definition: 'Waste rock and soil that lies above an ore deposit and must be removed to access the ore.',
+    category: 'geology',
+    relatedTerms: ['stripping ratio', 'waste', 'topsoil'],
+    example: 'We need to remove 3 tonnes of overburden for every tonne of ore.'
+  },
+  'bench': {
+    term: 'Bench',
+    definition: 'A horizontal ledge in an open pit mine that forms a single level of operation.',
+    category: 'geology',
+    relatedTerms: ['pit', 'level', 'face'],
+    example: 'Each bench is typically 10-15 meters high in large open pit mines.'
+  },
+  
+  // Process Terms
+  'blasting': {
+    term: 'Blasting',
+    definition: 'The controlled use of explosives to break rock for excavation.',
+    category: 'process',
+    relatedTerms: ['drilling', 'fragmentation', 'explosive'],
+    example: 'Blasting occurs twice daily at 7 AM and 3 PM.'
+  },
+  'crushing': {
+    term: 'Crushing',
+    definition: 'The process of reducing large rocks into smaller pieces for further processing.',
+    category: 'process',
+    relatedTerms: ['primary crusher', 'grinding', 'comminution'],
+    example: 'Primary crushing reduces ore from 1.5m to 30cm pieces.'
+  },
+  'leaching': {
+    term: 'Leaching',
+    definition: 'Chemical process to extract valuable metals from ore using solutions.',
+    category: 'process',
+    relatedTerms: ['heap leach', 'cyanide', 'recovery'],
+    example: 'Heap leaching can recover 70% of gold from low-grade ore.'
+  },
+  
+  // Technology Terms
+  'opc ua': {
     term: 'OPC UA',
-    definition: 'Open Platform Communications Unified Architecture - Industrial communication protocol enabling secure, reliable data exchange between devices and systems.',
-    category: 'opc-ua',
-    relatedTerms: ['Node', 'Server', 'Client', 'Mining Companion']
+    definition: 'Open Platform Communications Unified Architecture - Industrial communication protocol for secure, reliable data exchange in mining automation.',
+    category: 'technology',
+    relatedTerms: ['SCADA', 'automation', 'Industry 4.0'],
+    example: 'OPC UA enables real-time monitoring of all mining equipment.'
   },
-  {
-    term: 'Node',
-    definition: 'Basic unit of OPC UA address space representing a data point, object, or method. Each node has a unique identifier (NodeId).',
-    category: 'opc-ua',
-    relatedTerms: ['NodeId', 'Browse Name', 'Variable']
+  'scada': {
+    term: 'SCADA',
+    definition: 'Supervisory Control and Data Acquisition - System for remote monitoring and control of mining operations.',
+    category: 'technology',
+    relatedTerms: ['HMI', 'PLC', 'automation'],
+    example: 'SCADA systems monitor conveyor speeds and equipment status.'
   },
-  {
-    term: 'NodeId',
-    definition: 'Unique identifier for an OPC UA node within a server. Can be numeric, string, GUID, or opaque format.',
-    category: 'opc-ua',
-    relatedTerms: ['Node', 'Address Space', 'Namespace']
-  },
-  {
-    term: 'Browse Name',
-    definition: 'Human-readable name of an OPC UA node used for navigation. Unlike display names, browse names are unique within their namespace.',
-    category: 'opc-ua',
-    relatedTerms: ['Node', 'Display Name', 'Path']
-  },
-  {
-    term: 'Subscription',
-    definition: 'OPC UA mechanism for clients to receive notifications when monitored data changes, eliminating need for constant polling.',
-    category: 'opc-ua',
-    relatedTerms: ['Monitoring', 'Notification', 'Publishing Interval']
-  },
-  
-  // Standards Terms
-  {
-    term: 'Mining Companion',
-    definition: 'OPC UA Mining Companion Specification - Industry standard defining common information model for mining equipment and processes.',
-    category: 'standard',
-    relatedTerms: ['OPC UA', 'Companion Specification', 'Standards']
-  },
-  {
-    term: 'ISA-95',
-    definition: 'International standard for enterprise-control system integration, defining 5 levels from field devices (Level 0) to enterprise planning (Level 4).',
-    category: 'standard',
-    relatedTerms: ['Integration', 'MES', 'ERP', 'Levels']
-  },
-  {
-    term: 'Real-time',
-    definition: 'Data or process updates occurring with minimal delay, typically within seconds. Critical for operational decision-making in mining.',
-    category: 'process',
-    relatedTerms: ['Latency', 'Update Rate', 'Live Data']
-  },
-  
-  // Additional Mining Terms
-  {
-    term: 'Pit',
-    definition: 'Open excavation from which ore and waste rock are extracted. Can be several kilometers wide and hundreds of meters deep.',
-    category: 'process',
-    relatedTerms: ['Open-pit', 'Mine', 'Bench']
-  },
-  {
-    term: 'Crusher',
-    definition: 'Machine that breaks large rocks into smaller pieces as first step in ore processing. Primary crushers handle run-of-mine ore.',
-    category: 'equipment',
-    relatedTerms: ['Comminution', 'Processing', 'Size Reduction']
-  },
-  {
+  'telemetry': {
     term: 'Telemetry',
-    definition: 'Automated remote measurement and data transmission from equipment sensors. Enables real-time monitoring of equipment health and performance.',
+    definition: 'Automatic measurement and wireless transmission of data from remote equipment.',
+    category: 'technology',
+    relatedTerms: ['sensors', 'monitoring', 'data acquisition'],
+    example: 'Telemetry data shows the excavator\'s fuel consumption and location.'
+  },
+  
+  // Safety Terms
+  'tpms': {
+    term: 'TPMS',
+    definition: 'Tire Pressure Monitoring System - Critical safety system for haul trucks to prevent tire failures.',
+    category: 'safety',
+    relatedTerms: ['safety', 'monitoring', 'maintenance'],
+    example: 'TPMS alerts operators when tire pressure drops below safe levels.'
+  },
+  'geofence': {
+    term: 'Geofence',
+    definition: 'Virtual perimeter for real-world geographic areas used to ensure equipment stays within safe operating zones.',
+    category: 'safety',
+    relatedTerms: ['GPS', 'safety zone', 'proximity'],
+    example: 'Geofences prevent equipment from entering blast zones.'
+  },
+  
+  // Additional common terms
+  'au': {
+    term: 'Au',
+    definition: 'Chemical symbol for gold (from Latin: aurum). Used in grade measurements like g/t Au.',
     category: 'measurement',
-    relatedTerms: ['Sensors', 'Monitoring', 'Data Acquisition']
+    unit: 'g/t Au',
+    example: '5.2 g/t Au means 5.2 grams of gold per tonne of ore.'
+  },
+  'tph': {
+    term: 'TPH',
+    definition: 'Tonnes Per Hour - Standard measurement for material movement or processing rate.',
+    category: 'measurement',
+    unit: 't/h',
+    example: 'The crusher processes 500 TPH of ore.'
+  },
+  'pit': {
+    term: 'Open Pit',
+    definition: 'Surface mining operation where ore is extracted from a large excavation.',
+    category: 'geology',
+    relatedTerms: ['bench', 'ramp', 'pit wall'],
+    example: 'The Super Pit in Australia is over 3.5 km long and 600m deep.'
+  },
+  'node': {
+    term: 'Node',
+    definition: 'Basic unit in OPC UA representing a data point, object, or method in the address space.',
+    category: 'technology',
+    relatedTerms: ['NodeId', 'OPC UA', 'address space'],
+    example: 'Each equipment sensor is represented as a node in OPC UA.'
+  },
+  'nodeid': {
+    term: 'NodeId',
+    definition: 'Unique identifier for an OPC UA node, like "ns=1;s=Excavator_EX001.OreGrade".',
+    category: 'technology',
+    relatedTerms: ['node', 'namespace', 'identifier'],
+    example: 'Subscribe to NodeId "ns=1;s=MiningSite.Production.HourlyTonnage" for production data.'
+  },
+  'real-time': {
+    term: 'Real-time',
+    definition: 'Data updates occurring with minimal delay, typically within 1-2 seconds for mining operations.',
+    category: 'technology',
+    relatedTerms: ['telemetry', 'monitoring', 'latency'],
+    example: 'Real-time grade data helps operators adjust excavation patterns immediately.'
+  },
+  'isa-95': {
+    term: 'ISA-95',
+    definition: 'International standard for integrating enterprise and control systems, defining levels from field devices (L0) to business planning (L4).',
+    category: 'technology',
+    relatedTerms: ['MES', 'ERP', 'integration'],
+    example: 'OPC UA data flows from Level 1 devices up to Level 4 ERP systems.'
   }
-];
+};
 
-// Helper function to get definition for a term
+// Helper functions remain for compatibility
 export function getTermDefinition(term: string): MiningTerm | undefined {
-  return miningTerms.find(t => 
-    t.term.toLowerCase() === term.toLowerCase()
-  );
+  return miningTerms[term.toLowerCase()];
 }
 
-// Helper function to get terms by category
 export function getTermsByCategory(category: MiningTerm['category']): MiningTerm[] {
-  return miningTerms.filter(t => t.category === category);
+  return Object.values(miningTerms).filter(t => t.category === category);
 }
 
-// Helper function for fuzzy search
 export function searchTerms(query: string): MiningTerm[] {
   const lowerQuery = query.toLowerCase();
-  return miningTerms.filter(t => 
+  return Object.values(miningTerms).filter(t => 
     t.term.toLowerCase().includes(lowerQuery) ||
-    t.definition.toLowerCase().includes(lowerQuery)
+    t.definition.toLowerCase().includes(lowerQuery) ||
+    (t.example && t.example.toLowerCase().includes(lowerQuery))
   );
+}
+
+// Get all terms as array
+export function getAllTerms(): MiningTerm[] {
+  return Object.values(miningTerms);
+}
+
+// Get all unique categories
+export function getCategories(): string[] {
+  const categories = new Set(Object.values(miningTerms).map(t => t.category));
+  return Array.from(categories).sort();
 }
