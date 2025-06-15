@@ -1,315 +1,346 @@
-import { AppLayout } from '@/components/layout/AppLayout'
-import { Globe, TreePine, Eye, Database, ChevronRight, ChevronDown, Search } from 'lucide-react'
-import type { Metadata } from 'next'
+'use client';
 
-export const metadata: Metadata = {
-  title: 'OPC UA Explorer - MineSensors OPC UA',
-  description: 'Browse mining equipment nodes and explore the OPC UA address space'
-}
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import { AppLayout } from '@/components/layout/AppLayout';
+import { Globe } from 'lucide-react';
+import { OpcUaNode } from '@/types/websocket';
+import { useWebSocket } from '@/hooks/useWebSocket';
 
-// Mock OPC UA address space structure
-const mockAddressSpace = {
-  'Root': {
-    'Objects': {
-      'MiningSite_GoldRush': {
-        'MiningEquipment': {
-          'Excavators': {
-            'Excavator_EX001': {
-              'OreGrade': '2.5 g/t Au',
-              'BucketPosition': {
-                'X': '1000.0 m',
-                'Y': '2000.0 m', 
-                'Z': '-15.0 m'
-              },
-              'LoadWeight': '35.0 tonnes',
-              'OperationalMode': 'Digging'
-            },
-            'Excavator_EX002': {
-              'OreGrade': '3.2 g/t Au',
-              'LoadWeight': '42.0 tonnes',
-              'OperationalMode': 'Moving'
-            }
-          },
-          'HaulTrucks': {
-            'HaulTruck_TR001': {
-              'PayloadWeight': '180.0 tonnes',
-              'PayloadGrade': '2.8 g/t Au',
-              'Destination': 'Crusher'
-            },
-            'HaulTruck_TR002': {
-              'PayloadWeight': '220.0 tonnes',
-              'Destination': 'WasteDump'
-            },
-            'HaulTruck_TR003': {
-              'PayloadWeight': '0.0 tonnes',
-              'Destination': 'Stockpile_A'
-            }
-          },
-          'Conveyors': {
-            'ConveyorBelt_CV001': {
-              'ThroughputRate': '1200.0 t/h',
-              'BeltSpeed': '3.5 m/s',
-              'MaterialGrade': '2.6 g/t Au'
-            },
-            'ConveyorBelt_CV002': {
-              'ThroughputRate': '800.0 t/h',
-              'BeltSpeed': '2.8 m/s'
-            }
-          }
-        },
-        'GradeControlSystem': {
-          'AverageGrade': '2.8 g/t Au',
-          'GradeCutoff': '2.5 g/t Au'
-        },
-        'ProductionMetrics': {
-          'HourlyTonnage': '450.0 t/h',
-          'ActiveEquipmentCount': '7'
-        }
-      },
-      'DemoControls': {
-        'TriggerHighGradeDiscovery': '[Method]'
-      }
-    }
-  }
-}
-
-function TreeNode({ name, data, level = 0, isLast = false }: { 
-  name: string, 
-  data: any, 
-  level: number, 
-  isLast?: boolean 
-}) {
-  const isObject = typeof data === 'object' && data !== null && !Array.isArray(data)
-  const isValue = typeof data === 'string'
-  const isMethod = typeof data === 'string' && data.includes('[Method]')
-
-  return (
-    <div className="text-sm">
-      <div className="flex items-center space-x-2 py-1 hover:bg-slate-700/50 rounded px-2">
-        <div className="flex items-center" style={{ paddingLeft: `${level * 16}px` }}>
-          {isObject ? (
-            <ChevronDown className="w-4 h-4 text-slate-400" />
-          ) : (
-            <div className="w-4 h-4" />
-          )}
-        </div>
-        
-        {isObject ? (
-          <Database className="w-4 h-4 text-blue-400" />
-        ) : isMethod ? (
-          <div className="w-4 h-4 bg-purple-400 rounded-sm flex items-center justify-center">
-            <span className="text-xs text-white font-bold">M</span>
-          </div>
-        ) : (
-          <div className="w-4 h-4 bg-green-400 rounded-sm flex items-center justify-center">
-            <span className="text-xs text-white font-bold">V</span>
-          </div>
-        )}
-        
-        <span className="text-white font-mono">{name}</span>
-        
-        {isValue && (
-          <>
-            <span className="text-slate-400">:</span>
-            <span className={`${
-              isMethod ? 'text-purple-400' : 'text-green-400'
-            } font-mono`}>
-              {data}
-            </span>
-          </>
-        )}
+// Dynamically import components to avoid SSR issues
+const OpcUaExplorer = dynamic(() => import('@/components/opcua/OpcUaExplorer'), { 
+  ssr: false,
+  loading: () => (
+    <div className="bg-slate-800 border border-slate-600 rounded-lg p-8 animate-pulse">
+      <div className="h-8 bg-slate-700 rounded w-1/3 mb-4"></div>
+      <div className="space-y-2">
+        <div className="h-4 bg-slate-700 rounded w-full"></div>
+        <div className="h-4 bg-slate-700 rounded w-3/4"></div>
+        <div className="h-4 bg-slate-700 rounded w-1/2"></div>
       </div>
-      
-      {isObject && Object.entries(data).map(([key, value], index, array) => (
-        <TreeNode 
-          key={key} 
-          name={key} 
-          data={value} 
-          level={level + 1}
-          isLast={index === array.length - 1}
-        />
-      ))}
     </div>
   )
-}
+});
+
+const NodeDetails = dynamic(() => import('@/components/opcua/NodeDetails'), { ssr: false });
+const CodeExamples = dynamic(() => import('@/components/opcua/CodeExamples'), { ssr: false });
+
+// Mock OPC UA nodes for development
+const mockNodes: OpcUaNode[] = [
+  {
+    nodeId: 'ns=1;s=MiningSite_GoldRush',
+    browseName: 'MiningSite_GoldRush',
+    displayName: 'Gold Rush Mining Site',
+    nodeClass: 'Object',
+    isFolder: true,
+    children: [
+      {
+        nodeId: 'ns=1;s=MiningSite_GoldRush.MiningEquipment',
+        browseName: 'MiningEquipment',
+        displayName: 'Mining Equipment',
+        nodeClass: 'Object',
+        isFolder: true,
+        children: [
+          {
+            nodeId: 'ns=1;s=MiningSite_GoldRush.MiningEquipment.Excavators',
+            browseName: 'Excavators',
+            displayName: 'Excavators',
+            nodeClass: 'Object',
+            isFolder: true,
+            children: [
+              {
+                nodeId: 'ns=1;s=MiningSite_GoldRush.MiningEquipment.Excavators.EX001',
+                browseName: 'Excavator_EX001',
+                displayName: 'Excavator EX001',
+                nodeClass: 'Object',
+                isFolder: true,
+                children: [
+                  {
+                    nodeId: 'ns=1;s=MiningSite_GoldRush.MiningEquipment.Excavators.EX001.OreGrade',
+                    browseName: 'OreGrade',
+                    displayName: 'Ore Grade',
+                    nodeClass: 'Variable',
+                    dataType: 'Double',
+                    value: 5.2,
+                    isFolder: false,
+                    description: 'Current ore grade being excavated (g/t Au)'
+                  },
+                  {
+                    nodeId: 'ns=1;s=MiningSite_GoldRush.MiningEquipment.Excavators.EX001.LoadWeight',
+                    browseName: 'LoadWeight',
+                    displayName: 'Load Weight',
+                    nodeClass: 'Variable',
+                    dataType: 'Double',
+                    value: 35.0,
+                    isFolder: false,
+                    description: 'Current bucket load weight (tonnes)'
+                  },
+                  {
+                    nodeId: 'ns=1;s=MiningSite_GoldRush.MiningEquipment.Excavators.EX001.Status',
+                    browseName: 'OperationalMode',
+                    displayName: 'Operational Mode',
+                    nodeClass: 'Variable',
+                    dataType: 'String',
+                    value: 'Digging',
+                    isFolder: false,
+                    description: 'Current operational mode of the excavator'
+                  }
+                ]
+              },
+              {
+                nodeId: 'ns=1;s=MiningSite_GoldRush.MiningEquipment.Excavators.EX002',
+                browseName: 'Excavator_EX002',
+                displayName: 'Excavator EX002',
+                nodeClass: 'Object',
+                isFolder: true
+              }
+            ]
+          },
+          {
+            nodeId: 'ns=1;s=MiningSite_GoldRush.MiningEquipment.HaulTrucks',
+            browseName: 'HaulTrucks',
+            displayName: 'Haul Trucks',
+            nodeClass: 'Object',
+            isFolder: true,
+            children: [
+              {
+                nodeId: 'ns=1;s=MiningSite_GoldRush.MiningEquipment.HaulTrucks.TR001',
+                browseName: 'HaulTruck_TR001',
+                displayName: 'Haul Truck TR001',
+                nodeClass: 'Object',
+                isFolder: true,
+                children: [
+                  {
+                    nodeId: 'ns=1;s=MiningSite_GoldRush.MiningEquipment.HaulTrucks.TR001.PayloadWeight',
+                    browseName: 'PayloadWeight',
+                    displayName: 'Payload Weight',
+                    nodeClass: 'Variable',
+                    dataType: 'Double',
+                    value: 180.0,
+                    isFolder: false,
+                    description: 'Current payload weight (tonnes)'
+                  },
+                  {
+                    nodeId: 'ns=1;s=MiningSite_GoldRush.MiningEquipment.HaulTrucks.TR001.PayloadGrade',
+                    browseName: 'PayloadGrade',
+                    displayName: 'Payload Grade',
+                    nodeClass: 'Variable',
+                    dataType: 'Double',
+                    value: 2.8,
+                    isFolder: false,
+                    description: 'Average grade of payload (g/t Au)'
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            nodeId: 'ns=1;s=MiningSite_GoldRush.MiningEquipment.Conveyors',
+            browseName: 'Conveyors',
+            displayName: 'Conveyor Systems',
+            nodeClass: 'Object',
+            isFolder: true
+          }
+        ]
+      },
+      {
+        nodeId: 'ns=1;s=MiningSite_GoldRush.GradeControlSystem',
+        browseName: 'GradeControlSystem',
+        displayName: 'Grade Control System',
+        nodeClass: 'Object',
+        isFolder: true,
+        children: [
+          {
+            nodeId: 'ns=1;s=MiningSite_GoldRush.GradeControlSystem.AverageGrade',
+            browseName: 'AverageGrade',
+            displayName: 'Average Grade',
+            nodeClass: 'Variable',
+            dataType: 'Double',
+            value: 2.8,
+            isFolder: false,
+            description: 'Site-wide average ore grade (g/t Au)'
+          },
+          {
+            nodeId: 'ns=1;s=MiningSite_GoldRush.GradeControlSystem.CutoffGrade',
+            browseName: 'GradeCutoff',
+            displayName: 'Grade Cutoff',
+            nodeClass: 'Variable',
+            dataType: 'Double',
+            value: 1.5,
+            isFolder: false,
+            description: 'Economic cutoff grade (g/t Au) - minimum grade for profitable extraction'
+          }
+        ]
+      },
+      {
+        nodeId: 'ns=1;s=MiningSite_GoldRush.ProductionMetrics',
+        browseName: 'ProductionMetrics',
+        displayName: 'Production Metrics',
+        nodeClass: 'Object',
+        isFolder: true,
+        children: [
+          {
+            nodeId: 'ns=1;s=MiningSite_GoldRush.ProductionMetrics.HourlyTonnage',
+            browseName: 'HourlyTonnage',
+            displayName: 'Hourly Tonnage',
+            nodeClass: 'Variable',
+            dataType: 'Double',
+            value: 450.0,
+            isFolder: false,
+            description: 'Current production rate (t/h)'
+          }
+        ]
+      }
+    ]
+  },
+  {
+    nodeId: 'ns=1;s=DemoControls',
+    browseName: 'DemoControls',
+    displayName: 'Demo Controls',
+    nodeClass: 'Object',
+    isFolder: true,
+    children: [
+      {
+        nodeId: 'ns=1;s=DemoControls.TriggerHighGrade',
+        browseName: 'TriggerHighGradeDiscovery',
+        displayName: 'Trigger High Grade Discovery',
+        nodeClass: 'Method',
+        isFolder: false,
+        description: 'Simulate discovery of high-grade ore zone'
+      }
+    ]
+  }
+];
 
 export default function ExplorerPage() {
+  const { messageHistory, send } = useWebSocket();
+  const [selectedNode, setSelectedNode] = useState<OpcUaNode | null>(null);
+  const [subscribedNodes, setSubscribedNodes] = useState<Set<string>>(new Set());
+  const [realtimeValues, setRealtimeValues] = useState<Map<string, any>>(new Map());
+  
+  // Process OPC UA updates from WebSocket
+  useEffect(() => {
+    const latestMessage = messageHistory[messageHistory.length - 1];
+    if (!latestMessage || latestMessage.type !== 'opcua_updates') return;
+    
+    const updates = latestMessage.payload?.updates || [];
+    updates.forEach((update: any) => {
+      setRealtimeValues(prev => {
+        const next = new Map(prev);
+        next.set(update.nodeId, update.value);
+        return next;
+      });
+    });
+  }, [messageHistory]);
+  
+  const handleNodeSelect = (node: OpcUaNode) => {
+    setSelectedNode(node);
+  };
+  
+  const handleSubscribe = (nodeId: string) => {
+    setSubscribedNodes(prev => new Set(prev).add(nodeId));
+    
+    // Send subscription request via WebSocket
+    send({
+      type: 'opcua_subscribe',
+      nodeId,
+      interval: 1000
+    });
+  };
+  
+  const handleUnsubscribe = (nodeId: string) => {
+    setSubscribedNodes(prev => {
+      const next = new Set(prev);
+      next.delete(nodeId);
+      return next;
+    });
+    
+    // Send unsubscribe request via WebSocket
+    send({
+      type: 'opcua_unsubscribe',
+      nodeId
+    });
+  };
+  
   return (
     <AppLayout>
-      {/* Hero Section */}
-      <div className="mb-8">
-        <div className="flex items-center space-x-3 mb-4">
+      {/* Header Section */}
+      <div className="mb-6">
+        <div className="flex items-center space-x-3">
           <div className="p-2 bg-green-500/10 rounded-lg">
             <Globe className="w-6 h-6 text-green-400" />
           </div>
-          <div>
+          <div className="flex-1">
             <h1 className="text-3xl font-bold text-white">OPC UA Explorer</h1>
             <p className="text-slate-400">Browse mining equipment nodes and explore the OPC UA address space</p>
           </div>
         </div>
-        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
-          <div className="flex items-center space-x-2 mb-2">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-green-400 font-medium">Coming in Phase 4</span>
-          </div>
-          <p className="text-green-300 text-sm">
-            Interactive node browser with live value subscriptions and property inspection
+        
+        {/* Quick Introduction */}
+        <div className="mt-4 p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
+          <p className="text-sm text-gray-300">
+            <strong className="text-white">Getting Started:</strong> This explorer allows you to browse the real-time data structure of the mining operation. 
+            Click on folders to expand them, select variables to see their current values, and subscribe to receive live updates. 
+            Look for the <span className="text-yellow-400">yellow-highlighted mining equipment nodes</span> for the most relevant operational data.
           </p>
         </div>
       </div>
-
+      
+      {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Address Space Tree */}
-        <div className="lg:col-span-2 bg-slate-800 border border-slate-600 rounded-xl p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-3">
-              <TreePine className="w-5 h-5 text-green-400" />
-              <h3 className="text-lg font-semibold text-white">Mining Address Space</h3>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Search className="w-4 h-4 text-slate-400" />
-              <input 
-                type="text"
-                placeholder="Search nodes..."
-                className="bg-slate-700 border border-slate-600 rounded px-3 py-1 text-sm text-white placeholder-slate-400 w-48"
-              />
-            </div>
-          </div>
-          
-          <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 max-h-96 overflow-y-auto">
-            <div className="font-mono text-sm">
-              {Object.entries(mockAddressSpace).map(([key, value]) => (
-                <TreeNode key={key} name={key} data={value} level={0} />
-              ))}
-            </div>
-          </div>
-          
-          <div className="mt-4 p-3 bg-slate-700/50 rounded-lg">
-            <div className="flex items-center space-x-4 text-sm">
-              <div className="flex items-center space-x-2">
-                <Database className="w-4 h-4 text-blue-400" />
-                <span className="text-slate-300">Objects</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 bg-green-400 rounded-sm flex items-center justify-center">
-                  <span className="text-xs text-white font-bold">V</span>
-                </div>
-                <span className="text-slate-300">Variables</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-4 h-4 bg-purple-400 rounded-sm flex items-center justify-center">
-                  <span className="text-xs text-white font-bold">M</span>
-                </div>
-                <span className="text-slate-300">Methods</span>
-              </div>
-            </div>
-          </div>
+        {/* OPC UA Tree Explorer (2 columns) */}
+        <div className="lg:col-span-2">
+          <OpcUaExplorer
+            nodes={mockNodes}
+            onNodeSelect={handleNodeSelect}
+            selectedNodeId={selectedNode?.nodeId}
+            onSubscribe={handleSubscribe}
+            onUnsubscribe={handleUnsubscribe}
+            subscribedNodes={subscribedNodes}
+            className="h-full"
+          />
         </div>
-
-        {/* Node Inspector */}
+        
+        {/* Right Panel (1 column) */}
         <div className="space-y-6">
           
-          {/* Selected Node Properties */}
-          <div className="bg-slate-800 border border-slate-600 rounded-xl p-6">
-            <div className="flex items-center space-x-3 mb-4">
-              <Eye className="w-5 h-5 text-blue-400" />
-              <h3 className="text-lg font-semibold text-white">Node Properties</h3>
-            </div>
-            
-            <div className="space-y-3">
-              <div>
-                <label className="text-sm text-slate-400">Selected Node:</label>
-                <p className="text-white font-mono text-sm">Excavator_EX001.OreGrade</p>
-              </div>
-              
-              <div>
-                <label className="text-sm text-slate-400">Node ID:</label>
-                <p className="text-green-400 font-mono text-sm">ns=1;s=Excavator_EX001.OreGrade</p>
-              </div>
-              
-              <div>
-                <label className="text-sm text-slate-400">Data Type:</label>
-                <p className="text-blue-400 text-sm">Double</p>
-              </div>
-              
-              <div>
-                <label className="text-sm text-slate-400">Current Value:</label>
-                <p className="text-yellow-400 font-mono text-sm">2.5 g/t Au</p>
-              </div>
-              
-              <div>
-                <label className="text-sm text-slate-400">Last Updated:</label>
-                <p className="text-slate-300 text-sm">2024-06-12 16:30:15</p>
-              </div>
-              
-              <div>
-                <label className="text-sm text-slate-400">Access Level:</label>
-                <p className="text-green-400 text-sm">CurrentRead</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Subscription Panel */}
-          <div className="bg-slate-800 border border-slate-600 rounded-xl p-6">
-            <h4 className="text-lg font-semibold text-white mb-4">Live Subscriptions</h4>
-            
-            <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
-                <div>
-                  <p className="text-white text-sm font-mono">OreGrade Variables</p>
-                  <p className="text-slate-400 text-xs">2 nodes subscribed</p>
-                </div>
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              </div>
-              
-              <div className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
-                <div>
-                  <p className="text-white text-sm font-mono">Equipment Status</p>
-                  <p className="text-slate-400 text-xs">7 nodes subscribed</p>
-                </div>
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              </div>
-              
-              <div className="flex items-center justify-between p-3 bg-slate-700/50 rounded-lg">
-                <div>
-                  <p className="text-white text-sm font-mono">Production Metrics</p>
-                  <p className="text-slate-400 text-xs">3 nodes subscribed</p>
-                </div>
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              </div>
-            </div>
-            
-            <button className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-colors text-sm">
-              Subscribe to Selected Node
-            </button>
-          </div>
+          {/* Node Details */}
+          <NodeDetails
+            node={selectedNode}
+            isSubscribed={selectedNode ? subscribedNodes.has(selectedNode.nodeId) : false}
+            onSubscribe={handleSubscribe}
+            onUnsubscribe={handleUnsubscribe}
+            realtimeValue={selectedNode ? realtimeValues.get(selectedNode.nodeId) : undefined}
+          />
           
-          {/* OPC UA Standards Info */}
-          <div className="bg-slate-800 border border-slate-600 rounded-xl p-6">
-            <h4 className="text-lg font-semibold text-white mb-4">Standards Compliance</h4>
-            
-            <div className="space-y-3 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-slate-400">OPC UA Mining Companion</span>
-                <span className="text-green-400">v1.0 ✓</span>
+          {/* Code Examples */}
+          <CodeExamples
+            node={selectedNode}
+            serverUrl="opc.tcp://localhost:4840/mining-demo"
+          />
+          
+          {/* Subscription Summary */}
+          {subscribedNodes.size > 0 && (
+            <div className="bg-slate-800 border border-slate-600 rounded-lg p-4">
+              <h4 className="text-sm font-semibold text-white mb-3">Active Subscriptions</h4>
+              <div className="space-y-2">
+                {Array.from(subscribedNodes).map(nodeId => (
+                  <div key={nodeId} className="flex items-center justify-between p-2 bg-slate-700/50 rounded">
+                    <code className="text-xs text-blue-400 font-mono truncate flex-1">
+                      {nodeId}
+                    </code>
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse ml-2" />
+                  </div>
+                ))}
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-400">ISA-95 Hierarchy</span>
-                <span className="text-green-400">Level 1-3 ✓</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-400">Mining Equipment Types</span>
-                <span className="text-green-400">Compliant ✓</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-slate-400">Address Space Structure</span>
-                <span className="text-green-400">Standards-based ✓</span>
-              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                {subscribedNodes.size} node{subscribedNodes.size !== 1 ? 's' : ''} receiving live updates
+              </p>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </AppLayout>
-  )
+  );
 }
