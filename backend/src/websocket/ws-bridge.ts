@@ -102,12 +102,10 @@ export async function startWebSocketBridge(port: number, simulationEngine: Minin
 
   // Handle server shutdown
   process.on('SIGTERM', () => {
-    clearInterval(broadcastInterval);
     wss.close();
   });
 
   process.on('SIGINT', () => {
-    clearInterval(broadcastInterval);
     wss.close();
   });
 

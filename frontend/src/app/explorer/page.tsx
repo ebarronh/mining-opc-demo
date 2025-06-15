@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
+import nextDynamic from 'next/dynamic';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Globe } from 'lucide-react';
 import { OpcUaNode } from '@/types/websocket';
 import { useWebSocketContext } from '@/providers/WebSocketProvider';
 
 // Dynamically import components to avoid SSR issues
-const OpcUaExplorer = dynamic(() => import('@/components/opcua/OpcUaExplorer'), { 
+const OpcUaExplorer = nextDynamic(() => import('@/components/opcua/OpcUaExplorer'), { 
   ssr: false,
   loading: () => (
     <div className="bg-slate-800 border border-slate-600 rounded-lg p-8 animate-pulse">
@@ -22,8 +22,8 @@ const OpcUaExplorer = dynamic(() => import('@/components/opcua/OpcUaExplorer'), 
   )
 });
 
-const NodeDetails = dynamic(() => import('@/components/opcua/NodeDetails'), { ssr: false });
-const CodeExamples = dynamic(() => import('@/components/opcua/CodeExamples'), { ssr: false });
+const NodeDetails = nextDynamic(() => import('@/components/opcua/NodeDetails'), { ssr: false });
+const CodeExamples = nextDynamic(() => import('@/components/opcua/CodeExamples'), { ssr: false });
 
 // Mock OPC UA nodes for development
 const mockNodes: OpcUaNode[] = [

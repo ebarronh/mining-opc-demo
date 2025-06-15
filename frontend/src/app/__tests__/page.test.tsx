@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Home from '../page';
+import { WebSocketProvider } from '@/providers/WebSocketProvider';
 
 // Mock Next.js Link component
 jest.mock('next/link', () => {
@@ -42,7 +43,11 @@ describe('Home Page', () => {
   });
 
   test('renders main heading and subtitle', () => {
-    render(<Home />);
+    render(
+      <WebSocketProvider>
+        <Home />
+      </WebSocketProvider>
+    );
     
     // Check for the Mining Demo subtitle which is unique
     expect(screen.getByText('Mining Demo')).toBeInTheDocument();
@@ -52,7 +57,11 @@ describe('Home Page', () => {
   });
 
   test('renders navigation cards', () => {
-    render(<Home />);
+    render(
+      <WebSocketProvider>
+        <Home />
+      </WebSocketProvider>
+    );
     
     // Use more flexible text matching due to formatting
     expect(screen.getByRole('heading', { name: /Real-time Monitor/i })).toBeInTheDocument();
@@ -62,7 +71,11 @@ describe('Home Page', () => {
   });
 
   test('renders system status section', async () => {
-    render(<Home />);
+    render(
+      <WebSocketProvider>
+        <Home />
+      </WebSocketProvider>
+    );
     
     await waitFor(() => {
       expect(screen.getByText('System Status')).toBeInTheDocument();

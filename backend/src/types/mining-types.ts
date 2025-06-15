@@ -122,3 +122,65 @@ export interface MiningScenario {
   startTime: Date;
   parameters: Record<string, any>;
 }
+
+// WebSocket Message Types
+export interface EquipmentPosition {
+  id: string;
+  type: 'excavator' | 'truck' | 'conveyor';
+  position: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  rotation: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  status: 'operating' | 'idle' | 'error';
+  telemetry: Record<string, any>;
+}
+
+export interface GradeData {
+  timestamp: number;
+  grid: number[][];
+  gridSize: {
+    rows: number;
+    columns: number;
+  };
+  bounds: {
+    minX: number;
+    maxX: number;
+    minY: number;
+    maxY: number;
+  };
+  statistics: {
+    averageGrade: number;
+    minGrade: number;
+    maxGrade: number;
+  };
+}
+
+export interface OpcUaNode {
+  nodeId: string;
+  browseName: string;
+  displayName: string;
+  nodeClass: string;
+  dataType: string;
+  value: any;
+  hasChildren: boolean;
+  description: string;
+  namespace: number;
+  category: string;
+  accessLevel?: number;
+  userAccessLevel?: number;
+  writeMask?: number;
+  userWriteMask?: number;
+}
+
+export interface WebSocketMessage {
+  type: string;
+  payload?: any;
+  data?: any;
+  timestamp: string;
+}

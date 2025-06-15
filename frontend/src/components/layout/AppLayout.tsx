@@ -1,7 +1,6 @@
 'use client'
 
 import { MainNavigation } from '../navigation/MainNavigation'
-import { WebSocketProvider } from '@/providers/WebSocketProvider'
 import { HelpModeProvider } from '@/providers/HelpModeProvider'
 import { Glossary } from '../educational/Glossary'
 
@@ -11,16 +10,14 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   return (
-    <WebSocketProvider>
-      <HelpModeProvider>
-        <div className="min-h-screen bg-slate-900">
-          <MainNavigation />
-          <main className="container mx-auto px-4 py-6">
-            {children}
-          </main>
-          <Glossary />
-        </div>
-      </HelpModeProvider>
-    </WebSocketProvider>
+    <HelpModeProvider>
+      <div className="min-h-screen bg-slate-900">
+        <MainNavigation />
+        <main className="container mx-auto px-4 py-6">
+          {children}
+        </main>
+        <Glossary />
+      </div>
+    </HelpModeProvider>
   )
 }

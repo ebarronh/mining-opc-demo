@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import dynamic from 'next/dynamic';
+import nextDynamic from 'next/dynamic';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { WebSocketStatus } from '@/components/websocket/WebSocketStatus';
 import { useWebSocketContext } from '@/providers/WebSocketProvider';
@@ -11,7 +11,7 @@ import { HelpTarget } from '@/components/educational/HelpTarget';
 import { Tooltip } from '@/components/educational/Tooltip';
 
 // Dynamically import Three.js components to avoid SSR issues
-const MineScene = dynamic(() => import('@/components/three/MineScene'), { 
+const MineScene = nextDynamic(() => import('@/components/three/MineScene'), { 
   ssr: false,
   loading: () => (
     <div className="w-full h-full bg-slate-900 rounded-lg flex items-center justify-center">
@@ -23,10 +23,10 @@ const MineScene = dynamic(() => import('@/components/three/MineScene'), {
   )
 });
 
-const Equipment = dynamic(() => import('@/components/three/Equipment'), { ssr: false });
-const GradeHeatmap = dynamic(() => import('@/components/three/GradeHeatmap'), { ssr: false });
-const CameraControls = dynamic(() => import('@/components/three/CameraControls'), { ssr: false });
-const CameraControlsUI = dynamic(() => import('@/components/three/CameraControlsUI'), { ssr: false });
+const Equipment = nextDynamic(() => import('@/components/three/Equipment'), { ssr: false });
+const GradeHeatmap = nextDynamic(() => import('@/components/three/GradeHeatmap'), { ssr: false });
+const CameraControls = nextDynamic(() => import('@/components/three/CameraControls'), { ssr: false });
+const CameraControlsUI = nextDynamic(() => import('@/components/three/CameraControlsUI'), { ssr: false });
 
 // Mock data for development (will be replaced by WebSocket data)
 const mockEquipmentPositions: EquipmentPosition[] = [
@@ -100,6 +100,7 @@ const generateMockGradeData = (): GradeData => {
     }
   };
 };
+
 
 export default function RealTimePage() {
   const { 

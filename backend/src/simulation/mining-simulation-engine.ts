@@ -506,8 +506,8 @@ export class MiningSimulationEngine {
     // Add conveyors (stationary equipment)
     for (const [id, state] of this.conveyors) {
       const conveyorPositions = {
-        'CV001': { x: 100, y: 0, z: 0 },
-        'CV002': { x: -100, y: 100, z: 0 }
+        'CV001': { x: 100, y: 0, z: 0 },   // Ground level at scene coordinates
+        'CV002': { x: -100, y: 0, z: 100 } // Ground level, different Z position
       };
       
       const position = conveyorPositions[id as keyof typeof conveyorPositions] || { x: 0, y: 0, z: 0 };

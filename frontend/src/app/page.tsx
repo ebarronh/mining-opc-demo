@@ -1,5 +1,6 @@
 'use client'
 
+
 import { AppLayout } from '@/components/layout/AppLayout'
 import { SystemStatus } from '@/components/status/SystemStatus'
 import { WebSocketStatus } from '@/components/websocket/WebSocketStatus'

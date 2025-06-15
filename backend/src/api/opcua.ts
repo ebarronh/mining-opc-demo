@@ -32,18 +32,28 @@ export class OpcUaApiController {
       const references = rootNode.allReferences();
       
       for (const reference of references) {
-        if (reference.isForward && reference.referenceType?.browseName.name === 'HasChild') {
+        if (reference.isForward && reference.referenceType && 
+            (reference.referenceType as any).browseName?.name === 'HasChild') {
           const childNode = reference.node;
           if (childNode) {
+            const browseName = (childNode as any).browseName?.name || '';
+            const displayName = (childNode as any).displayName?.text || 
+                              (Array.isArray((childNode as any).displayName) ? 
+                                (childNode as any).displayName[0]?.text : '') || 
+                              browseName || '';
+            const description = (childNode as any).description?.text || 
+                              (Array.isArray((childNode as any).description) ? 
+                                (childNode as any).description[0]?.text : '') || '';
+            
             children.push({
               nodeId: childNode.nodeId.toString(),
-              browseName: childNode.browseName.name || '',
-              displayName: childNode.displayName?.text || childNode.browseName.name || '',
+              browseName,
+              displayName,
               nodeClass: this.getNodeClass(childNode),
               dataType: this.getDataType(childNode),
               value: await this.getNodeValue(childNode),
               hasChildren: this.hasChildren(childNode),
-              description: childNode.description?.text || '',
+              description,
               namespace: childNode.nodeId.namespace,
               category: this.categorizeNode(childNode)
             });
@@ -54,10 +64,16 @@ export class OpcUaApiController {
       // Sort children by browseName for consistent ordering
       children.sort((a, b) => a.browseName.localeCompare(b.browseName));
 
+      const rootBrowseName = (rootNode as any).browseName?.name || '';
+      const rootDisplayName = (rootNode as any).displayName?.text || 
+                             (Array.isArray((rootNode as any).displayName) ? 
+                               (rootNode as any).displayName[0]?.text : '') || 
+                             rootBrowseName || '';
+
       res.json({
         nodeId: nodeId as string,
-        browseName: rootNode.browseName.name,
-        displayName: rootNode.displayName?.text || rootNode.browseName.name,
+        browseName: rootBrowseName,
+        displayName: rootDisplayName,
         children,
         total: children.length
       });
@@ -88,15 +104,24 @@ export class OpcUaApiController {
         return;
       }
 
+      const browseName = (node as any).browseName?.name || '';
+      const displayName = (node as any).displayName?.text || 
+                         (Array.isArray((node as any).displayName) ? 
+                           (node as any).displayName[0]?.text : '') || 
+                         browseName || '';
+      const description = (node as any).description?.text || 
+                         (Array.isArray((node as any).description) ? 
+                           (node as any).description[0]?.text : '') || '';
+
       const nodeDetails: OpcUaNode = {
         nodeId: node.nodeId.toString(),
-        browseName: node.browseName.name || '',
-        displayName: node.displayName?.text || node.browseName.name || '',
+        browseName,
+        displayName,
         nodeClass: this.getNodeClass(node),
         dataType: this.getDataType(node),
         value: await this.getNodeValue(node),
         hasChildren: this.hasChildren(node),
-        description: node.description?.text || '',
+        description,
         namespace: node.nodeId.namespace,
         category: this.categorizeNode(node),
         // Additional details
@@ -326,7 +351,7 @@ export class OpcUaApiController {
   }
 
   private categorizeNode(node: any): string {
-    const browseName = node.browseName?.name?.toLowerCase() || '';
+    const browseName = (node.browseName?.name || '').toLowerCase();
     
     if (browseName.includes('excavator')) return 'excavator';
     if (browseName.includes('truck') || browseName.includes('haul')) return 'truck';

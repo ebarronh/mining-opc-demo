@@ -5,6 +5,7 @@ import { Mesh, Group, BoxGeometry, CylinderGeometry } from 'three';
 import { Text, Html } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { EquipmentPosition } from '@/types/websocket';
+import { miningToScene, isValidMiningCoordinates } from '@/utils/coordinateTransform';
 
 interface EquipmentProps {
   data: EquipmentPosition;
@@ -21,11 +22,11 @@ const STATUS_COLORS = {
   maintenance: '#ff0000'
 };
 
-function Excavator({ data, showLabel }: { data: EquipmentPosition; showLabel?: boolean }) {
+function Excavator({ data, showLabel, scenePosition }: { data: EquipmentPosition; showLabel?: boolean; scenePosition: { x: number; y: number; z: number } }) {
   const groupRef = useRef<Group>(null);
   
   return (
-    <group ref={groupRef} position={[data.position.x, data.position.y, data.position.z]}>
+    <group ref={groupRef} position={[scenePosition.x, scenePosition.y, scenePosition.z]}>
       {/* Main body */}
       <mesh castShadow receiveShadow>
         <boxGeometry args={[8, 6, 10]} />
@@ -76,7 +77,7 @@ function Excavator({ data, showLabel }: { data: EquipmentPosition; showLabel?: b
   );
 }
 
-function HaulTruck({ data, showLabel }: { data: EquipmentPosition; showLabel?: boolean }) {
+function HaulTruck({ data, showLabel, scenePosition }: { data: EquipmentPosition; showLabel?: boolean; scenePosition: { x: number; y: number; z: number } }) {
   const groupRef = useRef<Group>(null);
   const wheelRefs = useRef<Mesh[]>([]);
   
@@ -90,7 +91,7 @@ function HaulTruck({ data, showLabel }: { data: EquipmentPosition; showLabel?: b
   });
   
   return (
-    <group ref={groupRef} position={[data.position.x, data.position.y, data.position.z]}>
+    <group ref={groupRef} position={[scenePosition.x, scenePosition.y, scenePosition.z]}>
       {/* Main body */}
       <mesh castShadow receiveShadow>
         <boxGeometry args={[6, 4, 12]} />
@@ -139,13 +140,13 @@ function HaulTruck({ data, showLabel }: { data: EquipmentPosition; showLabel?: b
   );
 }
 
-function Conveyor({ data, showLabel }: { data: EquipmentPosition; showLabel?: boolean }) {
+function Conveyor({ data, showLabel, scenePosition }: { data: EquipmentPosition; showLabel?: boolean; scenePosition: { x: number; y: number; z: number } }) {
   const groupRef = useRef<Group>(null);
   
   return (
-    <group ref={groupRef} position={[data.position.x, data.position.y, data.position.z]}>
-      {/* Conveyor belt structure */}
-      <mesh castShadow receiveShadow>
+    <group ref={groupRef} position={[scenePosition.x, scenePosition.y, scenePosition.z]}>
+      {/* Conveyor belt structure - positioned above ground */}
+      <mesh position={[0, 0, 0]} castShadow receiveShadow>
         <boxGeometry args={[4, 1, 50]} />
         <meshStandardMaterial color="#444444" />
       </mesh>
@@ -156,7 +157,7 @@ function Conveyor({ data, showLabel }: { data: EquipmentPosition; showLabel?: bo
         <meshStandardMaterial color={STATUS_COLORS[data.status]} />
       </mesh>
       
-      {/* Support pillars */}
+      {/* Support pillars - extend down to ground */}
       {[-20, -10, 0, 10, 20].map((z, i) => (
         <mesh key={i} position={[0, -2, z]} castShadow>
           <cylinderGeometry args={[0.5, 0.5, 4]} />
@@ -235,6 +236,29 @@ export default function Equipment({ data, onHover, onClick, onDoubleClick, showL
   const [isHovered, setIsHovered] = useState(false);
   const [highlightIntensity, setHighlightIntensity] = useState(0);
   
+  // Transform coordinates from mining space to scene space
+  const scenePosition = useMemo(() => {
+    let position;
+    
+    // Check if coordinates look like mining coordinates (large values)
+    if (isValidMiningCoordinates(data.position)) {
+      position = miningToScene(data.position);
+    } else {
+      // If coordinates are already in scene space, use them directly
+      position = data.position;
+    }
+    
+    // Ensure equipment sits ON the ground (Y=0 is ground level)
+    // Add small offset so equipment doesn't clip through ground
+    const groundOffset = data.type === 'conveyor' ? 2 : 1; // Conveyors higher for support structure
+    
+    return {
+      x: position.x,
+      y: Math.max(0, position.y) + groundOffset, // Ensure Y >= 0 + offset
+      z: position.z
+    };
+  }, [data.position, data.type]);
+  
   // Animate highlight on hover
   useFrame((state, delta) => {
     const target = isHovered ? 1 : 0;
@@ -285,9 +309,9 @@ export default function Equipment({ data, onHover, onClick, onDoubleClick, showL
         </mesh>
       )}
       
-      {data.type === 'excavator' && <Excavator data={data} showLabel={showLabel} />}
-      {data.type === 'truck' && <HaulTruck data={data} showLabel={showLabel} />}
-      {data.type === 'conveyor' && <Conveyor data={data} showLabel={showLabel} />}
+      {data.type === 'excavator' && <Excavator data={data} showLabel={showLabel} scenePosition={scenePosition} />}
+      {data.type === 'truck' && <HaulTruck data={data} showLabel={showLabel} scenePosition={scenePosition} />}
+      {data.type === 'conveyor' && <Conveyor data={data} showLabel={showLabel} scenePosition={scenePosition} />}
       
       {/* Tooltip */}
       <EquipmentTooltip data={data} visible={isHovered} />

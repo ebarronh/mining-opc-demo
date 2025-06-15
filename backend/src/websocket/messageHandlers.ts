@@ -36,6 +36,12 @@ export class MessageHandlers {
     });
   }
 
+  // Remove a client manually (for external cleanup)
+  removeClient(ws: WebSocket): void {
+    this.connectedClients.delete(ws);
+    console.log(`Client manually removed. Total clients: ${this.connectedClients.size}`);
+  }
+
   // Send initial data to a newly connected client
   private sendInitialData(ws: WebSocket): void {
     // Send welcome message
