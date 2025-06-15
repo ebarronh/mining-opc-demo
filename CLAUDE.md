@@ -11,6 +11,16 @@ Executive-ready, standards-based real-time ore intelligence platform showcasing 
 - ✅ Dark theme with mining-specific visual identity
 - ✅ Puppeteer validation script
 
+## Phase 4: 3D Visualization & OPC UA Explorer (IN PROGRESS)
+- ✅ Three.js 3D mine scene with equipment visualization
+- ✅ Grade heatmap overlay with toggle functionality
+- ✅ Camera controls with keyboard shortcuts
+- ✅ OPC UA Explorer with tree navigation
+- ✅ Node details panel with value interpretation
+- ✅ Code examples for JavaScript, Python, and REST API
+- ✅ Educational context for mining values (ore grades, weights, production)
+- ✅ Comprehensive test suite with pre-commit hooks
+
 ## Development Commands
 
 ### Frontend Development
@@ -51,7 +61,7 @@ pnpm dev
 # Build entire project
 pnpm build
 
-# Run all tests
+# Run all tests (required for pre-commit hooks)
 pnpm test
 
 # Lint entire codebase
@@ -60,6 +70,39 @@ pnpm lint
 # Format code
 pnpm format
 ```
+
+### Testing
+```bash
+# Run all tests (must pass for commits)
+pnpm test
+
+# Run backend tests only
+pnpm --filter backend test
+
+# Run frontend tests only
+pnpm --filter frontend test
+
+# Run tests in watch mode
+pnpm --filter frontend test:watch
+pnpm --filter backend test:watch
+```
+
+#### Test Setup Notes
+1. **Pre-commit hooks**: The project uses Husky to run tests before commits. All tests must pass.
+2. **Backend tests**: 
+   - Requires `ts-jest` to be installed
+   - Jest config is in `backend/jest.config.js`
+   - Basic test file exists at `backend/src/server.test.ts`
+3. **Frontend tests**: 
+   - Mock `useSystemStatus` hook to avoid `AbortSignal.timeout` errors
+   - Mock `SystemStatus` component to avoid API calls during tests
+   - Use flexible matchers for text that may have formatting (e.g., `getByRole` instead of `getByText`)
+   - Test files located alongside components (e.g., `Component.test.tsx`)
+4. **Common test issues**:
+   - "Preset ts-jest not found": Run `pnpm install --force` to ensure all dependencies are installed
+   - "Multiple elements found": Use more specific queries or `getAllBy*` variants
+   - "AbortSignal.timeout is not a function": Mock the hooks that use fetch with timeouts
+   - Text matching issues: Use regex patterns for partial matches
 
 ### Phase 3 Validation
 ```bash
@@ -118,7 +161,16 @@ frontend/
 │   │   ├── layout/           # Layout components
 │   │   ├── navigation/       # Navigation components
 │   │   ├── status/           # System status components
-│   │   └── websocket/        # WebSocket components
+│   │   ├── websocket/        # WebSocket components
+│   │   ├── three/            # 3D visualization components
+│   │   │   ├── MineScene.tsx # Main 3D scene container
+│   │   │   ├── Equipment.tsx # 3D equipment models
+│   │   │   ├── GradeHeatmap.tsx # Grade overlay visualization
+│   │   │   └── CameraControls.tsx # Camera interaction
+│   │   └── opcua/            # OPC UA Explorer components
+│   │       ├── OpcUaExplorer.tsx # Tree navigation
+│   │       ├── NodeDetails.tsx # Node information panel
+│   │       └── CodeExamples.tsx # Code snippet generator
 │   ├── hooks/                # Custom React hooks
 │   │   ├── useSystemStatus.ts # Backend health integration
 │   │   └── useWebSocket.ts    # WebSocket client hook
@@ -159,6 +211,30 @@ pnpm test
 # Check for linting issues
 pnpm lint
 ```
+
+### 4. Committing Changes
+```bash
+# Stage changes
+git add -A
+
+# Commit (will trigger pre-commit hooks)
+git commit -m "feat: your commit message"
+
+# If tests fail, fix them before committing
+# Never use --no-verify to bypass tests
+
+# Push to remote
+git push origin main
+```
+
+**Commit Message Format:**
+- `feat:` New features
+- `fix:` Bug fixes
+- `test:` Test additions or fixes
+- `docs:` Documentation changes
+- `refactor:` Code refactoring
+- `style:` Formatting changes
+- `chore:` Maintenance tasks
 
 ## Phase 4 Preparation
 
