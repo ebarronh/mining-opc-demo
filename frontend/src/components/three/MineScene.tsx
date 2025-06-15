@@ -86,23 +86,26 @@ export default function MineScene({ className, children }: MineSceneProps) {
         }}
       >
         <Suspense fallback={null}>
-          {/* Camera setup - 45-degree angled view */}
+          {/* Camera setup - Better initial view to see whole mine */}
           <PerspectiveCamera
             makeDefault
-            position={[150, 100, 150]}
+            position={[300, 200, 300]} // Further out for better overview
             fov={60}
             near={0.1}
-            far={1000}
+            far={2000}
           />
           
-          {/* Orbit controls */}
+          {/* Orbit controls - Improved for better navigation */}
           <OrbitControls
             target={[0, 0, 0]}
-            maxPolarAngle={Math.PI / 2.1}
-            minDistance={50}
-            maxDistance={400}
+            maxPolarAngle={Math.PI * 0.85} // Allow more vertical movement
+            minDistance={20} // Allow closer zoom
+            maxDistance={800} // Allow zooming out to see full site
             enableDamping
             dampingFactor={0.05}
+            enablePan={true} // Ensure panning is enabled
+            panSpeed={1}
+            rotateSpeed={0.8}
           />
           
           {/* Environment and lighting */}

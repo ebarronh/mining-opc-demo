@@ -26,21 +26,50 @@ export default function CameraControlsUI({ showShortcuts, onToggleShortcuts }: C
     <>
       {/* Keyboard shortcuts panel */}
       {showShortcuts && (
-        <div className="absolute top-4 right-4 bg-black/80 text-white p-4 rounded-lg backdrop-blur-sm z-50">
-          <h3 className="text-lg font-semibold mb-3">Keyboard Shortcuts</h3>
-          <div className="space-y-2">
-            {shortcuts.map(({ key, description }) => (
-              <div key={key} className="flex items-center gap-3">
-                <kbd className="px-2 py-1 bg-gray-700 rounded text-sm font-mono min-w-[2rem] text-center">
-                  {key}
-                </kbd>
-                <span className="text-sm">{description}</span>
+        <div className="absolute top-4 right-4 bg-black/80 text-white p-4 rounded-lg backdrop-blur-sm z-50 max-w-sm">
+          <h3 className="text-lg font-semibold mb-3">Controls & Navigation</h3>
+          
+          {/* Mouse Navigation */}
+          <div className="mb-4">
+            <h4 className="text-sm font-medium mb-2 text-gray-300">Mouse Navigation</h4>
+            <div className="space-y-1 text-sm text-gray-400">
+              <div className="flex items-start gap-2">
+                <span className="text-white">Left Click + Drag:</span>
+                <span>Rotate view</span>
               </div>
-            ))}
+              <div className="flex items-start gap-2">
+                <span className="text-white">Right Click + Drag:</span>
+                <span>Pan/Move camera</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-white">Scroll Wheel:</span>
+                <span>Zoom in/out</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-white">Double Click:</span>
+                <span>Focus on equipment</span>
+              </div>
+            </div>
           </div>
+          
+          {/* Keyboard Shortcuts */}
+          <div>
+            <h4 className="text-sm font-medium mb-2 text-gray-300">Keyboard Shortcuts</h4>
+            <div className="space-y-2">
+              {shortcuts.map(({ key, description }) => (
+                <div key={key} className="flex items-center gap-3">
+                  <kbd className="px-2 py-1 bg-gray-700 rounded text-sm font-mono min-w-[2rem] text-center">
+                    {key}
+                  </kbd>
+                  <span className="text-sm">{description}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          
           <div className="mt-4 pt-4 border-t border-gray-600">
             <p className="text-xs text-gray-400">
-              Double-click on equipment to focus
+              Tip: Use right-click + drag to explore different areas of the mine
             </p>
           </div>
         </div>

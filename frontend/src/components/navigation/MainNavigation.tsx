@@ -51,7 +51,7 @@ export function MainNavigation() {
   
   // Determine active tab based on current route
   const getActiveTab = () => {
-    if (pathname === '/') return 'home'
+    if (!pathname || pathname === '/') return 'home'
     const currentTab = navigationTabs.find(tab => pathname.startsWith(tab.href))
     return currentTab?.id || 'home'
   }
@@ -158,7 +158,7 @@ export function MainNavigation() {
         </Tabs.Root>
 
         {/* Tab Descriptions */}
-        {pathname !== '/' && (
+        {pathname && pathname !== '/' && (
           <div className="py-3 border-t border-slate-700/50 mt-4">
             {navigationTabs.map((tab) => (
               pathname.startsWith(tab.href) && (

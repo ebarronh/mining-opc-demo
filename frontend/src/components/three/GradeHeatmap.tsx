@@ -12,28 +12,28 @@ interface GradeHeatmapProps {
   onCellClick?: (row: number, col: number, grade: number) => void;
 }
 
-// Grade color mapping (low to high)
+// Grade color mapping (low to high) - Enhanced colors for better visibility
 const getGradeColor = (grade: number): Color => {
   const color = new Color();
   
   if (grade < 0.5) {
-    // Blue for low grade
-    color.setRGB(0, 0, 1);
+    // Deep blue for low grade
+    color.setHSL(0.6, 1, 0.5);
   } else if (grade < 1.0) {
     // Cyan for low-medium
-    color.setRGB(0, 1, 1);
+    color.setHSL(0.5, 1, 0.5);
   } else if (grade < 1.5) {
     // Green for medium
-    color.setRGB(0, 1, 0);
+    color.setHSL(0.33, 1, 0.5);
   } else if (grade < 2.0) {
     // Yellow for medium-high
-    color.setRGB(1, 1, 0);
+    color.setHSL(0.17, 1, 0.5);
   } else if (grade < 2.5) {
     // Orange for high
-    color.setRGB(1, 0.5, 0);
+    color.setHSL(0.08, 1, 0.5);
   } else {
     // Red for very high
-    color.setRGB(1, 0, 0);
+    color.setHSL(0, 1, 0.5);
   }
   
   return color;
@@ -80,7 +80,7 @@ export default function GradeHeatmap({ data, visible, onCellClick }: GradeHeatma
   
   // Fade in/out animation
   useFrame((state, delta) => {
-    const targetOpacity = visible ? 0.7 : 0;
+    const targetOpacity = visible ? 0.85 : 0; // Increased opacity for better visibility
     setOpacity(prev => {
       const diff = targetOpacity - prev;
       return prev + diff * delta * 3; // Smooth transition
@@ -105,7 +105,7 @@ export default function GradeHeatmap({ data, visible, onCellClick }: GradeHeatma
       for (let col = 0; col < columns; col++) {
         const x = data.bounds.minX + col * cellWidth;
         const z = data.bounds.minY + row * cellHeight;
-        const y = 0.5; // Slightly above ground
+        const y = 1.5; // Higher above ground for better visibility
         
         const vertexIndex = (row * columns + col) * 4;
         
@@ -192,6 +192,7 @@ export default function GradeHeatmap({ data, visible, onCellClick }: GradeHeatma
           transparent
           opacity={opacity}
           depthWrite={false}
+          side={2} // DoubleSide - render both sides
         />
       </mesh>
       
