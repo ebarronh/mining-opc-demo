@@ -42,9 +42,9 @@ export interface GradeData {
 export interface OpcUaUpdate {
   nodeId: string;
   value: any;
-  timestamp: number;
+  timestamp: number | string;
   dataType: string;
-  statusCode: string;
+  statusCode?: string;
 }
 
 export interface OpcUaNode {
@@ -60,9 +60,10 @@ export interface OpcUaNode {
 }
 
 export interface WebSocketMessage {
-  type: 'equipment_data' | 'equipment_positions' | 'grade_data' | 'opcua_updates' | 'system_health';
-  payload: any;
-  timestamp: number;
+  type: 'equipment_data' | 'equipment_positions' | 'grade_data' | 'opcua_updates' | 'system_health' | 'connection_established' | 'heartbeat' | 'pong' | 'system_status' | 'subscription_confirmed' | 'subscription_cancelled' | 'error';
+  payload?: any;
+  data?: any;
+  timestamp: number | string;
 }
 
 export interface EquipmentPositionsMessage extends WebSocketMessage {

@@ -1,6 +1,7 @@
 import WebSocket from 'ws';
 import { MiningSimulationEngine } from '../simulation/mining-simulation-engine';
 import { MiningDataUpdate } from '../types/mining-types';
+import { MessageHandlers } from './messageHandlers';
 
 interface WebSocketStats {
   activeConnections: number;
@@ -16,7 +17,7 @@ let wsStats: WebSocketStats = {
   startTime: new Date()
 };
 
-export async function startWebSocketBridge(port: number, simulationEngine: MiningSimulationEngine): Promise<WebSocketStats> {
+export async function startWebSocketBridge(port: number, simulationEngine: MiningSimulationEngine, messageHandlers?: MessageHandlers): Promise<WebSocketStats> {
   console.log(`🔄 Starting WebSocket bridge on port ${port}...`);
 
   // Create WebSocket server
@@ -34,6 +35,11 @@ export async function startWebSocketBridge(port: number, simulationEngine: Minin
     
     console.log(`🔗 New WebSocket client connected from ${request.socket.remoteAddress}`);
     console.log(`📊 Active connections: ${wsStats.activeConnections}`);
+
+    // Add client to message handlers if available
+    if (messageHandlers) {
+      messageHandlers.addClient(ws);
+    }
 
     // Send welcome message with connection info
     const welcomeMessage = {
@@ -54,6 +60,9 @@ export async function startWebSocketBridge(port: number, simulationEngine: Minin
     ws.on('message', (message: WebSocket.Data) => {
       try {
         const data = JSON.parse(message.toString());
+        if (messageHandlers) {
+          messageHandlers.handleIncomingMessage(ws, data);
+        }
         handleClientMessage(ws, data, simulationEngine);
       } catch (error) {
         console.error('Error parsing client message:', error);
@@ -69,19 +78,27 @@ export async function startWebSocketBridge(port: number, simulationEngine: Minin
     ws.on('close', () => {
       wsStats.activeConnections--;
       console.log(`🔌 WebSocket client disconnected. Active connections: ${wsStats.activeConnections}`);
+      
+      // Remove client from message handlers
+      if (messageHandlers) {
+        messageHandlers.removeClient(ws);
+      }
     });
 
     // Handle connection errors
     ws.on('error', (error) => {
       console.error('WebSocket connection error:', error);
       wsStats.activeConnections--;
+      
+      // Remove client from message handlers
+      if (messageHandlers) {
+        messageHandlers.removeClient(ws);
+      }
     });
   });
 
-  // Set up periodic data broadcasting
-  const broadcastInterval = setInterval(() => {
-    broadcastMiningData(wss, simulationEngine);
-  }, 2000); // Broadcast every 2 seconds
+  // Note: Periodic data broadcasting is now handled by the simulation engine
+  // through MessageHandlers, so we don't need the legacy broadcasting here
 
   // Handle server shutdown
   process.on('SIGTERM', () => {
@@ -192,30 +209,28 @@ function handleEquipmentListRequest(ws: WebSocket): void {
   wsStats.messagesSent++;
 }
 
+// Legacy mining data broadcasting - now handled by MessageHandlers
+// This function is kept for backwards compatibility with existing client messages
 function broadcastMiningData(wss: WebSocket.Server, simulationEngine: MiningSimulationEngine): void {
   if (wsStats.activeConnections === 0) {
     return; // No clients to broadcast to
   }
 
-  // Get current mining data from simulation engine
+  // Create legacy format mining data for backwards compatibility
   const miningData: MiningDataUpdate = {
     timestamp: new Date().toISOString(),
     equipment: {
-      excavators: [
-        // This would be populated by the simulation engine
-        // For now, we'll create sample data structure
-      ],
+      excavators: [],
       trucks: [],
       conveyors: []
     },
     siteMetrics: {
-      hourlyTonnage: 1800 + Math.random() * 400, // 1800-2200 t/h
-      averageGrade: 2.5 + Math.random() * 1.0,   // 2.5-3.5 g/t
+      hourlyTonnage: 1800 + Math.random() * 400,
+      averageGrade: 2.5 + Math.random() * 1.0,
       activeEquipment: simulationEngine.getEquipmentCount()
     }
   };
 
-  // Add performance metrics
   const performanceData = {
     type: 'mining_data',
     data: miningData,
@@ -228,11 +243,10 @@ function broadcastMiningData(wss: WebSocket.Server, simulationEngine: MiningSimu
 
   const message = JSON.stringify(performanceData);
 
-  // Broadcast to all connected clients
+  // Broadcast to all connected clients (legacy support)
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
       try {
-        // Check if client has specific subscriptions
         const subscriptions = (client as any).subscriptions || ['all'];
         
         if (subscriptions.includes('all') || shouldSendToClient(subscriptions, miningData)) {

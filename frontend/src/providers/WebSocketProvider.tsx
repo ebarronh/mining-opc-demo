@@ -1,7 +1,8 @@
 'use client'
 
-import { createContext, useContext, ReactNode } from 'react'
+import React, { createContext, useContext, ReactNode } from 'react'
 import { useWebSocket, UseWebSocketReturn, WebSocketMessage } from '@/hooks/useWebSocket'
+import type { EquipmentPosition, GradeData, OpcUaUpdate } from '@/types/websocket'
 
 interface WebSocketContextType extends UseWebSocketReturn {
   // Mining-specific message types
@@ -10,6 +11,10 @@ interface WebSocketContextType extends UseWebSocketReturn {
   triggerScenario: (scenario: string, parameters?: Record<string, any>) => void
   getEquipmentList: () => void
   ping: () => void
+  // New message type handlers
+  equipmentPositions: EquipmentPosition[]
+  gradeData: GradeData | null
+  opcUaUpdates: OpcUaUpdate[]
 }
 
 const WebSocketContext = createContext<WebSocketContextType | null>(null)
@@ -18,7 +23,22 @@ interface WebSocketProviderProps {
   children: ReactNode
 }
 
+// State management for real-time data
+interface WebSocketState {
+  equipmentPositions: EquipmentPosition[]
+  gradeData: GradeData | null
+  opcUaUpdates: OpcUaUpdate[]
+}
+
+const initialState: WebSocketState = {
+  equipmentPositions: [],
+  gradeData: null,
+  opcUaUpdates: []
+}
+
 export function WebSocketProvider({ children }: WebSocketProviderProps) {
+  const [state, setState] = React.useState<WebSocketState>(initialState)
+
   const webSocket = useWebSocket({
     onOpen: () => {
       console.log('🔗 WebSocket connected to mining demo backend')
@@ -29,26 +49,50 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
     onError: (event) => {
       console.log('❌ WebSocket connection error')
     },
+    onEquipmentPositions: (data) => {
+      console.log('🚛 Equipment positions updated:', data.equipment?.length || 0, 'items')
+      setState(prev => ({
+        ...prev,
+        equipmentPositions: data.equipment || []
+      }))
+    },
+    onGradeData: (data) => {
+      console.log('📊 Grade data updated')
+      setState(prev => ({
+        ...prev,
+        gradeData: data
+      }))
+    },
+    onOpcUaUpdates: (data) => {
+      console.log('🔄 OPC UA updates received:', data.updates?.length || 0, 'updates')
+      setState(prev => ({
+        ...prev,
+        opcUaUpdates: data.updates || []
+      }))
+    },
     onMessage: (message: WebSocketMessage) => {
-      // Handle specific message types for mining demo
+      // Handle other message types for mining demo
       switch (message.type) {
-        case 'connection':
-          console.log('✅ Mining demo connection established:', message.message)
-          break
-        case 'mining_data':
-          console.log('📊 Mining data received:', message.data?.siteMetrics)
+        case 'connection_established':
+          console.log('✅ Mining demo connection established:', message.payload?.message)
           break
         case 'subscription_confirmed':
-          console.log('📺 Subscription confirmed for:', message.equipment)
+          console.log('📺 Subscription confirmed for:', message.payload?.nodeId)
           break
-        case 'scenario_response':
-          console.log('🎬 Scenario response:', message.scenario, message.success)
+        case 'subscription_cancelled':
+          console.log('📺 Subscription cancelled for:', message.payload?.nodeId)
           break
-        case 'equipment_list':
-          console.log('🚛 Equipment list received:', message.equipment)
+        case 'heartbeat':
+          console.log('💓 Heartbeat received')
+          break
+        case 'pong':
+          console.log('🏓 Pong received')
+          break
+        case 'system_status':
+          console.log('🔧 System status:', message.payload?.status)
           break
         case 'error':
-          console.error('⚠️ Server error:', message.message)
+          console.error('⚠️ Server error:', message.payload?.message)
           break
         default:
           console.log('📨 Unknown message type:', message.type)
@@ -97,7 +141,10 @@ export function WebSocketProvider({ children }: WebSocketProviderProps) {
     unsubscribeFrom,
     triggerScenario,
     getEquipmentList,
-    ping
+    ping,
+    equipmentPositions: state.equipmentPositions,
+    gradeData: state.gradeData,
+    opcUaUpdates: state.opcUaUpdates
   }
 
   return (

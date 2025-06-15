@@ -1,12 +1,26 @@
+'use client'
+
 import { AppLayout } from '@/components/layout/AppLayout'
 import { SystemStatus } from '@/components/status/SystemStatus'
 import { WebSocketStatus } from '@/components/websocket/WebSocketStatus'
+import { useWebSocketContext } from '@/providers/WebSocketProvider'
 import Link from 'next/link'
-import { BarChart3, Globe, Link as LinkIcon, CheckCircle, Pickaxe } from 'lucide-react'
+import { BarChart3, Globe, Link as LinkIcon, CheckCircle, Pickaxe, Activity, Zap } from 'lucide-react'
 
-export default function Home() {
+function HomeContent() {
+  const { 
+    isConnected, 
+    equipmentPositions, 
+    gradeData, 
+    opcUaUpdates 
+  } = useWebSocketContext();
+
+  const activeEquipmentCount = equipmentPositions.filter(eq => eq.status === 'operating').length;
+  const averageGrade = gradeData?.statistics?.averageGrade || 0;
+  const recentUpdatesCount = opcUaUpdates.length;
+
   return (
-    <AppLayout>
+    <>
       {/* Hero Section */}
       <div className="text-center mb-12 fade-in">
         <div className="flex justify-center mb-6">
@@ -27,16 +41,19 @@ export default function Home() {
         </p>
         <div className="mt-6 flex items-center justify-center space-x-4 text-sm text-slate-400">
           <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span>Phase 3 Active</span>
+            <div className={`w-2 h-2 rounded-full animate-pulse ${
+              isConnected ? 'bg-green-400' : 'bg-red-400'
+            }`}></div>
+            <span>{isConnected ? 'Connected' : 'Disconnected'}</span>
           </div>
           <div className="w-1 h-4 bg-slate-600"></div>
           <div className="flex items-center space-x-2">
-            <span>ISA-95 Compliant</span>
+            <Activity className="w-3 h-3" />
+            <span>{activeEquipmentCount} Active Equipment</span>
           </div>
           <div className="w-1 h-4 bg-slate-600"></div>
           <div className="flex items-center space-x-2">
-            <span>Real-time Ready</span>
+            <span>{averageGrade.toFixed(1)}% Avg Grade</span>
           </div>
         </div>
       </div>
@@ -58,8 +75,14 @@ export default function Home() {
               <p className="text-slate-400 group-hover:text-slate-300 transition-colors">
                 3D mine pit visualization with live equipment tracking, grade heatmaps, and real-time data streaming
               </p>
-              <div className="mt-3 text-sm text-blue-400">
-                Coming in Phase 4 →
+              <div className="mt-3 flex items-center justify-between">
+                <span className="text-sm text-blue-400">Active Now →</span>
+                {equipmentPositions.length > 0 && (
+                  <div className="flex items-center space-x-1 text-xs text-green-400">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span>{equipmentPositions.length} devices</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -80,8 +103,14 @@ export default function Home() {
               <p className="text-slate-400 group-hover:text-slate-300 transition-colors">
                 Browse hierarchical mining equipment nodes, subscribe to live values, and explore the OPC UA address space
               </p>
-              <div className="mt-3 text-sm text-green-400">
-                Coming in Phase 4 →
+              <div className="mt-3 flex items-center justify-between">
+                <span className="text-sm text-green-400">Active Now →</span>
+                {recentUpdatesCount > 0 && (
+                  <div className="flex items-center space-x-1 text-xs text-green-400">
+                    <Zap className="w-3 h-3" />
+                    <span>{recentUpdatesCount} updates</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -132,6 +161,86 @@ export default function Home() {
         </Link>
       </div>
 
+      {/* Live Data Dashboard */}
+      {isConnected && (equipmentPositions.length > 0 || gradeData || opcUaUpdates.length > 0) && (
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-white mb-6">Live Data Dashboard</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            {/* Equipment Status */}
+            <div className="executive-card p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-white">Equipment</h3>
+                <Activity className="w-5 h-5 text-blue-400" />
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Total:</span>
+                  <span className="text-white font-medium">{equipmentPositions.length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Operating:</span>
+                  <span className="text-green-400 font-medium">{activeEquipmentCount}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Idle:</span>
+                  <span className="text-yellow-400 font-medium">{
+                    equipmentPositions.filter(eq => eq.status === 'idle').length
+                  }</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Grade Data */}
+            {gradeData && (
+              <div className="executive-card p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-white">Grade Data</h3>
+                  <BarChart3 className="w-5 h-5 text-orange-400" />
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Average:</span>
+                    <span className="text-white font-medium">{gradeData.statistics.averageGrade.toFixed(2)}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Max:</span>
+                    <span className="text-green-400 font-medium">{gradeData.statistics.maxGrade.toFixed(2)}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Min:</span>
+                    <span className="text-red-400 font-medium">{gradeData.statistics.minGrade.toFixed(2)}%</span>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* OPC UA Updates */}
+            <div className="executive-card p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-white">OPC UA</h3>
+                <Globe className="w-5 h-5 text-green-400" />
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Recent Updates:</span>
+                  <span className="text-white font-medium">{opcUaUpdates.length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Status:</span>
+                  <span className="text-green-400 font-medium">Active</span>
+                </div>
+                {opcUaUpdates.length > 0 && (
+                  <div className="text-xs text-slate-500 mt-2">
+                    Last: {new Date(opcUaUpdates[opcUaUpdates.length - 1]?.timestamp).toLocaleTimeString()}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* System Status Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
@@ -141,6 +250,14 @@ export default function Home() {
           <WebSocketStatus showDetails={true} />
         </div>
       </div>
+    </>
+  )
+}
+
+export default function Home() {
+  return (
+    <AppLayout>
+      <HomeContent />
     </AppLayout>
   )
 }

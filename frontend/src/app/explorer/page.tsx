@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Globe } from 'lucide-react';
 import { OpcUaNode } from '@/types/websocket';
-import { useWebSocket } from '@/hooks/useWebSocket';
+import { useWebSocketContext } from '@/providers/WebSocketProvider';
 
 // Dynamically import components to avoid SSR issues
 const OpcUaExplorer = dynamic(() => import('@/components/opcua/OpcUaExplorer'), { 
@@ -213,25 +213,27 @@ const mockNodes: OpcUaNode[] = [
 ];
 
 export default function ExplorerPage() {
-  const { messageHistory, send } = useWebSocket();
+  const { send, opcUaUpdates, isConnected } = useWebSocketContext();
   const [selectedNode, setSelectedNode] = useState<OpcUaNode | null>(null);
   const [subscribedNodes, setSubscribedNodes] = useState<Set<string>>(new Set());
   const [realtimeValues, setRealtimeValues] = useState<Map<string, any>>(new Map());
   
-  // Process OPC UA updates from WebSocket
+  // Process OPC UA updates from WebSocket context
   useEffect(() => {
-    const latestMessage = messageHistory[messageHistory.length - 1];
-    if (!latestMessage || latestMessage.type !== 'opcua_updates') return;
+    if (!opcUaUpdates || opcUaUpdates.length === 0) return;
     
-    const updates = latestMessage.payload?.updates || [];
-    updates.forEach((update: any) => {
+    opcUaUpdates.forEach((update) => {
       setRealtimeValues(prev => {
         const next = new Map(prev);
-        next.set(update.nodeId, update.value);
+        next.set(update.nodeId, {
+          value: update.value,
+          timestamp: update.timestamp,
+          dataType: update.dataType
+        });
         return next;
       });
     });
-  }, [messageHistory]);
+  }, [opcUaUpdates]);
   
   const handleNodeSelect = (node: OpcUaNode) => {
     setSelectedNode(node);
@@ -242,9 +244,11 @@ export default function ExplorerPage() {
     
     // Send subscription request via WebSocket
     send({
-      type: 'opcua_subscribe',
-      nodeId,
-      interval: 1000
+      type: 'subscribe_opcua',
+      payload: {
+        nodeId,
+        interval: 1000
+      }
     });
   };
   
@@ -257,8 +261,10 @@ export default function ExplorerPage() {
     
     // Send unsubscribe request via WebSocket
     send({
-      type: 'opcua_unsubscribe',
-      nodeId
+      type: 'unsubscribe_opcua',
+      payload: {
+        nodeId
+      }
     });
   };
   
@@ -311,7 +317,7 @@ export default function ExplorerPage() {
             isSubscribed={selectedNode ? subscribedNodes.has(selectedNode.nodeId) : false}
             onSubscribe={handleSubscribe}
             onUnsubscribe={handleUnsubscribe}
-            realtimeValue={selectedNode ? realtimeValues.get(selectedNode.nodeId) : undefined}
+            realtimeValue={selectedNode ? realtimeValues.get(selectedNode.nodeId)?.value : undefined}
           />
           
           {/* Code Examples */}
@@ -323,19 +329,43 @@ export default function ExplorerPage() {
           {/* Subscription Summary */}
           {subscribedNodes.size > 0 && (
             <div className="bg-slate-800 border border-slate-600 rounded-lg p-4">
-              <h4 className="text-sm font-semibold text-white mb-3">Active Subscriptions</h4>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-sm font-semibold text-white">Active Subscriptions</h4>
+                <div className="text-xs text-slate-500">
+                  {isConnected ? (
+                    <span className="text-green-400">Connected</span>
+                  ) : (
+                    <span className="text-red-400">Disconnected</span>
+                  )}
+                </div>
+              </div>
               <div className="space-y-2">
-                {Array.from(subscribedNodes).map(nodeId => (
-                  <div key={nodeId} className="flex items-center justify-between p-2 bg-slate-700/50 rounded">
-                    <code className="text-xs text-blue-400 font-mono truncate flex-1">
-                      {nodeId}
-                    </code>
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse ml-2" />
-                  </div>
-                ))}
+                {Array.from(subscribedNodes).map(nodeId => {
+                  const realtimeData = realtimeValues.get(nodeId);
+                  return (
+                    <div key={nodeId} className="p-2 bg-slate-700/50 rounded">
+                      <div className="flex items-center justify-between">
+                        <code className="text-xs text-blue-400 font-mono truncate flex-1">
+                          {nodeId}
+                        </code>
+                        <div className={`w-2 h-2 rounded-full ml-2 ${
+                          realtimeData ? 'bg-green-400 animate-pulse' : 'bg-gray-500'
+                        }`} />
+                      </div>
+                      {realtimeData && (
+                        <div className="mt-1 text-xs text-slate-300">
+                          <div>Value: {String(realtimeData.value)}</div>
+                          <div className="text-slate-500">
+                            {new Date(realtimeData.timestamp).toLocaleTimeString()}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
               <p className="text-xs text-gray-500 mt-2">
-                {subscribedNodes.size} node{subscribedNodes.size !== 1 ? 's' : ''} receiving live updates
+                {subscribedNodes.size} node{subscribedNodes.size !== 1 ? 's' : ''} subscribed
               </p>
             </div>
           )}

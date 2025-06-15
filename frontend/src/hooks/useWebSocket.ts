@@ -11,13 +11,24 @@ export interface WebSocketMessage {
   [key: string]: any
 }
 
+// Message queue for performance optimization
+interface MessageQueue {
+  messages: WebSocketMessage[]
+  lastProcessed: number
+}
+
 export interface UseWebSocketOptions {
   reconnectAttempts?: number
   reconnectInterval?: number
+  messageQueueSize?: number
+  processingInterval?: number
   onOpen?: () => void
   onClose?: () => void
   onError?: (error: Event) => void
   onMessage?: (message: WebSocketMessage) => void
+  onEquipmentPositions?: (data: any) => void
+  onGradeData?: (data: any) => void
+  onOpcUaUpdates?: (data: any) => void
 }
 
 export interface UseWebSocketReturn {
@@ -30,6 +41,7 @@ export interface UseWebSocketReturn {
   reconnect: () => void
   messageHistory: WebSocketMessage[]
   connectionAttempts: number
+  queueSize: number
 }
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:4841/ws'
@@ -51,10 +63,15 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
   const {
     reconnectAttempts = 3,
     reconnectInterval = 1000,
+    messageQueueSize = 50,
+    processingInterval = 100,
     onOpen,
     onClose,
     onError,
-    onMessage
+    onMessage,
+    onEquipmentPositions,
+    onGradeData,
+    onOpcUaUpdates
   } = options
 
   const [state, setState] = useState<WebSocketState>('disconnected')
@@ -65,6 +82,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
   const wsRef = useRef<WebSocket | null>(null)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const shouldReconnectRef = useRef(true)
+  const messageQueueRef = useRef<MessageQueue>({ messages: [], lastProcessed: Date.now() })
+  const processingIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   const isConnected = state === 'connected'
 
@@ -81,6 +100,58 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
       return newHistory
     })
   }, [])
+
+  // Process specific message types with handlers
+  const processMessage = useCallback((message: WebSocketMessage) => {
+    switch (message.type) {
+      case 'equipment_positions':
+        onEquipmentPositions?.(message.payload || message.data)
+        break
+      case 'grade_data':
+        onGradeData?.(message.payload || message.data)
+        break
+      case 'opcua_updates':
+        onOpcUaUpdates?.(message.payload || message.data)
+        break
+      default:
+        // Handle generic message
+        onMessage?.(message)
+        break
+    }
+  }, [onEquipmentPositions, onGradeData, onOpcUaUpdates, onMessage])
+
+  // Queue message for processing
+  const queueMessage = useCallback((message: WebSocketMessage) => {
+    const queue = messageQueueRef.current
+    queue.messages.push(message)
+    
+    // Limit queue size for performance
+    if (queue.messages.length > messageQueueSize) {
+      queue.messages = queue.messages.slice(-messageQueueSize)
+    }
+  }, [messageQueueSize])
+
+  // Process queued messages at intervals
+  const processMessageQueue = useCallback(() => {
+    const queue = messageQueueRef.current
+    const now = Date.now()
+    
+    // Only process if enough time has passed
+    if (now - queue.lastProcessed < processingInterval) {
+      return
+    }
+    
+    // Process all queued messages
+    const messagesToProcess = [...queue.messages]
+    queue.messages = []
+    queue.lastProcessed = now
+    
+    messagesToProcess.forEach(message => {
+      processMessage(message)
+      setLastMessage(message)
+      addToHistory(message)
+    })
+  }, [processingInterval, processMessage, addToHistory])
 
   const connect = useCallback(() => {
     // Check if there's already a global connection
@@ -170,9 +241,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
           const message: WebSocketMessage = JSON.parse(event.data)
           console.log('WebSocket message received:', message.type)
           
-          setLastMessage(message)
-          addToHistory(message)
-          onMessage?.(message)
+          // Add to queue for batch processing
+          queueMessage(message)
         } catch (err) {
           console.error('Failed to parse WebSocket message:', err, event.data)
         }
@@ -182,7 +252,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
       console.error('Failed to create WebSocket connection:', error)
       setState('error')
     }
-  }, [reconnectAttempts, reconnectInterval, onOpen, onClose, onError, onMessage, addToHistory, clearReconnectTimeout])
+  }, [reconnectAttempts, reconnectInterval, onOpen, onClose, onError, queueMessage, clearReconnectTimeout])
 
   const disconnect = useCallback(() => {
     shouldReconnectRef.current = false
@@ -218,6 +288,18 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
     }
   }, [])
 
+  // Set up message processing interval
+  useEffect(() => {
+    processingIntervalRef.current = setInterval(processMessageQueue, processingInterval)
+    
+    return () => {
+      if (processingIntervalRef.current) {
+        clearInterval(processingIntervalRef.current)
+        processingIntervalRef.current = null
+      }
+    }
+  }, [processMessageQueue, processingInterval])
+
   // Auto-connect on mount
   useEffect(() => {
     shouldReconnectRef.current = true
@@ -232,6 +314,10 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
       clearTimeout(connectTimeout)
       shouldReconnectRef.current = false
       clearReconnectTimeout()
+      if (processingIntervalRef.current) {
+        clearInterval(processingIntervalRef.current)
+        processingIntervalRef.current = null
+      }
       if (wsRef.current) {
         console.log('Cleaning up WebSocket connection on unmount')
         wsRef.current.close(1000, 'Component unmount')
@@ -249,6 +335,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
     disconnect,
     reconnect,
     messageHistory,
-    connectionAttempts
+    connectionAttempts,
+    queueSize: messageQueueRef.current.messages.length
   }
 }

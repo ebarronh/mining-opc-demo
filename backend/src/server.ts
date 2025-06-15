@@ -13,6 +13,8 @@ import { createMiningAddressSpace } from './addressSpace/mining-namespace';
 import { startWebSocketBridge } from './websocket/ws-bridge';
 import { createHealthEndpoint } from './api/metrics';
 import { MiningSimulationEngine } from './simulation/mining-simulation-engine';
+import { MessageHandlers } from './websocket/messageHandlers';
+import { OpcUaApiController } from './api/opcua';
 
 const PORT = process.env.PORT || 3001;
 const OPC_UA_PORT = parseInt(process.env.OPC_UA_PORT || '4840');
@@ -21,6 +23,8 @@ const WEBSOCKET_PORT = parseInt(process.env.WEBSOCKET_PORT || '4841');
 let opcuaServer: OPCUAServer;
 let expressApp: express.Application;
 let simulationEngine: MiningSimulationEngine;
+let messageHandlers: MessageHandlers;
+let opcUaApiController: OpcUaApiController;
 
 async function startOPCUAServer(): Promise<void> {
   console.log("🚀 Starting MineSensors OPC UA Educational Mining Demo Server...");
@@ -51,10 +55,18 @@ async function startOPCUAServer(): Promise<void> {
   await createMiningAddressSpace(opcuaServer);
   console.log("🏗️  Mining address space created");
 
-  // Start simulation engine
-  simulationEngine = new MiningSimulationEngine(opcuaServer);
+  // Initialize message handlers
+  messageHandlers = new MessageHandlers();
+  console.log("📨 Message handlers initialized");
+
+  // Start simulation engine with message handlers
+  simulationEngine = new MiningSimulationEngine(opcuaServer, messageHandlers);
   await simulationEngine.start();
   console.log("⚙️  Mining simulation engine started");
+
+  // Initialize OPC UA API controller
+  opcUaApiController = new OpcUaApiController(opcuaServer);
+  console.log("🔌 OPC UA API controller initialized");
 
   // Start OPC UA server
   await opcuaServer.start();
@@ -67,6 +79,14 @@ async function startExpressAPI(): Promise<void> {
   expressApp.use(cors());
   expressApp.use(express.json());
 
+  // Add OPC UA API routes
+  expressApp.get('/api/opcua/browse', (req, res) => opcUaApiController.browse(req, res));
+  expressApp.get('/api/opcua/node/:nodeId', (req, res) => opcUaApiController.getNodeDetails(req, res));
+  expressApp.post('/api/opcua/subscribe', (req, res) => opcUaApiController.subscribe(req, res));
+  expressApp.delete('/api/opcua/subscribe', (req, res) => opcUaApiController.unsubscribe(req, res));
+  expressApp.get('/api/opcua/subscriptions', (req, res) => opcUaApiController.getSubscriptions(req, res));
+  expressApp.post('/api/opcua/write', (req, res) => opcUaApiController.writeNode(req, res));
+
   // Add health endpoint for Puppeteer validation
   createHealthEndpoint(expressApp, () => {
     return {
@@ -76,7 +96,7 @@ async function startExpressAPI(): Promise<void> {
         data_updates_per_second: simulationEngine?.getUpdateRate() || 0
       },
       websocket: {
-        active_connections: 0, // Will be updated by WebSocket bridge
+        active_connections: messageHandlers?.getStats().connectedClients || 0,
         messages_sent: 0
       },
       simulation: {
@@ -97,8 +117,8 @@ async function startExpressAPI(): Promise<void> {
 }
 
 async function startWebSocketServer(): Promise<void> {
-  // Start WebSocket bridge for real-time data streaming
-  const wsStats = await startWebSocketBridge(WEBSOCKET_PORT, simulationEngine);
+  // Start WebSocket bridge for real-time data streaming with message handlers
+  const wsStats = await startWebSocketBridge(WEBSOCKET_PORT, simulationEngine, messageHandlers);
   console.log(`🔄 WebSocket bridge listening on port ${WEBSOCKET_PORT}`);
   
   // Update health endpoint with WebSocket stats

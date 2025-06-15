@@ -1,5 +1,7 @@
 import { OPCUAServer, Variant, DataType } from 'node-opcua';
-import { ExcavatorData, HaulTruckData, ConveyorData, DigCycleState, MineCoordinate, MiningScenario } from '../types/mining-types';
+import { ExcavatorData, HaulTruckData, ConveyorData, DigCycleState, MineCoordinate, MiningScenario, EquipmentPosition } from '../types/mining-types';
+import { MessageHandlers } from '../websocket/messageHandlers';
+import { GradeGenerator } from './gradeGenerator';
 
 export class MiningSimulationEngine {
   private server: OPCUAServer;
@@ -7,14 +9,18 @@ export class MiningSimulationEngine {
   private startTime: Date;
   private updateCount = 0;
   private activeScenarios: MiningScenario[] = [];
+  private messageHandlers: MessageHandlers | null = null;
+  private gradeGenerator: GradeGenerator;
   
   // Equipment simulation state
   private excavators: Map<string, ExcavatorSimulationState> = new Map();
   private trucks: Map<string, TruckSimulationState> = new Map();
   private conveyors: Map<string, ConveyorSimulationState> = new Map();
 
-  constructor(server: OPCUAServer) {
+  constructor(server: OPCUAServer, messageHandlers?: MessageHandlers) {
     this.server = server;
+    this.messageHandlers = messageHandlers || null;
+    this.gradeGenerator = new GradeGenerator();
     this.startTime = new Date();
     this.initializeEquipmentStates();
   }
@@ -146,6 +152,11 @@ export class MiningSimulationEngine {
 
     // Process active scenarios
     this.processActiveScenarios(currentTime);
+
+    // Broadcast updates via WebSocket if handlers are available
+    if (this.messageHandlers) {
+      this.broadcastUpdates();
+    }
   }
 
   private updateExcavators(currentTime: number): void {
@@ -418,6 +429,158 @@ export class MiningSimulationEngine {
         this.processHighGradeDiscoveryScenario(scenario, currentTime);
       }
     }
+  }
+
+  private broadcastUpdates(): void {
+    if (!this.messageHandlers) return;
+
+    // Broadcast equipment positions
+    const equipmentPositions = this.getEquipmentPositions();
+    this.messageHandlers.broadcastEquipmentPositions(equipmentPositions);
+
+    // Broadcast grade data every other update (every 4 seconds)
+    if (this.updateCount % 2 === 0) {
+      const gradeData = this.gradeGenerator.generateGradeData();
+      this.messageHandlers.broadcastGradeData(gradeData);
+    }
+
+    // Broadcast OPC UA updates
+    const opcUaUpdates = this.getOpcUaValueUpdates();
+    if (opcUaUpdates.length > 0) {
+      this.messageHandlers.broadcastOpcUaUpdates(opcUaUpdates);
+    }
+  }
+
+  private getEquipmentPositions(): EquipmentPosition[] {
+    const positions: EquipmentPosition[] = [];
+
+    // Add excavators
+    for (const [id, state] of this.excavators) {
+      positions.push({
+        id,
+        type: 'excavator',
+        position: {
+          x: state.position.X,
+          y: state.position.Y, 
+          z: state.position.Z
+        },
+        rotation: { x: 0, y: 0, z: 0 },
+        status: this.getEquipmentStatus(state.fuelLevel),
+        telemetry: {
+          speed: 0,
+          payload: state.loadWeight,
+          temperature: 75,
+          fuelLevel: state.fuelLevel,
+          engineRPM: state.engineRPM,
+          hydraulicPressure: state.hydraulicPressure,
+          oreGrade: state.oreGrade,
+          cycleState: state.cycleState
+        }
+      });
+    }
+
+    // Add trucks
+    for (const [id, state] of this.trucks) {
+      positions.push({
+        id,
+        type: 'truck',
+        position: {
+          x: state.position.X,
+          y: state.position.Y,
+          z: state.position.Z
+        },
+        rotation: { x: 0, y: state.heading * Math.PI / 180, z: 0 },
+        status: this.getEquipmentStatus(95 - state.engineTemp), // Use temperature as health indicator
+        telemetry: {
+          speed: state.speed,
+          payload: state.payloadWeight,
+          temperature: state.engineTemp,
+          destination: state.destination,
+          payloadGrade: state.payloadGrade,
+          loadCycles: state.loadCycles,
+          routeProgress: state.routeProgress
+        }
+      });
+    }
+
+    // Add conveyors (stationary equipment)
+    for (const [id, state] of this.conveyors) {
+      const conveyorPositions = {
+        'CV001': { x: 100, y: 0, z: 0 },
+        'CV002': { x: -100, y: 100, z: 0 }
+      };
+      
+      const position = conveyorPositions[id as keyof typeof conveyorPositions] || { x: 0, y: 0, z: 0 };
+      
+      positions.push({
+        id,
+        type: 'conveyor',
+        position,
+        rotation: { x: 0, y: Math.PI / 2, z: 0 },
+        status: state.emergencyStop ? 'error' : 'operating',
+        telemetry: {
+          throughputRate: state.throughputRate,
+          beltSpeed: state.beltSpeed,
+          materialGrade: state.materialGrade,
+          beltTension: state.beltTension,
+          vibrationLevel: state.vibrationLevel,
+          powerConsumption: state.powerConsumption,
+          runHours: state.runHours
+        }
+      });
+    }
+
+    return positions;
+  }
+
+  private getEquipmentStatus(healthIndicator: number): 'operating' | 'idle' | 'error' {
+    if (healthIndicator < 20) return 'error';
+    if (healthIndicator < 50) return 'idle';
+    return 'operating';
+  }
+
+  private getOpcUaValueUpdates(): Array<{ nodeId: string; value: any; dataType: string; timestamp: string }> {
+    const updates: Array<{ nodeId: string; value: any; dataType: string; timestamp: string }> = [];
+    const timestamp = new Date().toISOString();
+
+    // Sample some key OPC UA values for broadcasting
+    const avgGrade = this.calculateSiteAverageGrade();
+    const totalTonnage = Array.from(this.conveyors.values()).reduce((sum, c) => sum + c.throughputRate, 0);
+
+    updates.push(
+      {
+        nodeId: 'ns=1;s=GradeControlSystem.AverageGrade',
+        value: avgGrade,
+        dataType: 'Double',
+        timestamp
+      },
+      {
+        nodeId: 'ns=1;s=ProductionMetrics.HourlyTonnage',
+        value: totalTonnage,
+        dataType: 'Double',
+        timestamp
+      },
+      {
+        nodeId: 'ns=1;s=ProductionMetrics.ActiveEquipmentCount',
+        value: this.getEquipmentCount(),
+        dataType: 'Int32',
+        timestamp
+      }
+    );
+
+    // Add some equipment-specific updates
+    for (const [id, state] of this.excavators) {
+      if (Math.random() < 0.3) { // Randomly update some values
+        updates.push({
+          nodeId: `ns=1;s=Excavator_${id}.OreGrade`,
+          value: state.oreGrade,
+          dataType: 'Double',
+          timestamp
+        });
+      }
+    }
+
+    return updates;
   }
 
   private processHighGradeDiscoveryScenario(scenario: MiningScenario, currentTime: number): void {

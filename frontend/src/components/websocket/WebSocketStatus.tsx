@@ -9,7 +9,18 @@ interface WebSocketStatusProps {
 }
 
 export function WebSocketStatus({ showDetails = false, className = '' }: WebSocketStatusProps) {
-  const { state, isConnected, connectionAttempts, lastMessage, messageHistory, reconnect, ping } = useWebSocketContext()
+  const { 
+    state, 
+    isConnected, 
+    connectionAttempts, 
+    lastMessage, 
+    messageHistory, 
+    reconnect, 
+    ping,
+    equipmentPositions,
+    gradeData,
+    opcUaUpdates
+  } = useWebSocketContext()
 
   const getStatusIcon = () => {
     switch (state) {
@@ -111,6 +122,18 @@ export function WebSocketStatus({ showDetails = false, className = '' }: WebSock
           <span className="text-slate-400">Messages Received:</span>
           <span className="text-white">{messageHistory.length}</span>
         </div>
+        <div className="flex justify-between">
+          <span className="text-slate-400">Equipment Positions:</span>
+          <span className="text-white">{equipmentPositions.length}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-slate-400">Grade Data:</span>
+          <span className="text-white">{gradeData ? 'Available' : 'N/A'}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-slate-400">OPC UA Updates:</span>
+          <span className="text-white">{opcUaUpdates.length}</span>
+        </div>
         {lastMessage && (
           <div className="flex justify-between">
             <span className="text-slate-400">Last Message:</span>
@@ -124,26 +147,48 @@ export function WebSocketStatus({ showDetails = false, className = '' }: WebSock
         <div className="mt-4 pt-4 border-t border-slate-700">
           <h4 className="text-sm font-medium text-slate-300 mb-2">Recent Messages</h4>
           <div className="space-y-1 max-h-32 overflow-y-auto">
-            {messageHistory.slice(0, 5).map((msg, index) => (
-              <div key={index} className="flex justify-between text-xs">
-                <span className="text-slate-400 truncate">{msg.type}</span>
-                <span className="text-slate-500">
-                  {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : 'now'}
-                </span>
-              </div>
-            ))}
+            {messageHistory.slice(0, 5).map((msg, index) => {
+              const isNewType = ['equipment_positions', 'grade_data', 'opcua_updates'].includes(msg.type);
+              return (
+                <div key={index} className="flex justify-between text-xs">
+                  <span className={`truncate ${
+                    isNewType ? 'text-green-400 font-medium' : 'text-slate-400'
+                  }`}>
+                    {msg.type}
+                  </span>
+                  <span className="text-slate-500">
+                    {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString() : 'now'}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
 
-      {/* Phase 4 Preview */}
+      {/* Live Data Status */}
       <div className="mt-4 pt-4 border-t border-slate-700">
         <div className="flex items-center space-x-2 mb-2">
-          <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-          <span className="text-sm text-blue-400 font-medium">Phase 4 Ready</span>
+          <div className={`w-2 h-2 rounded-full ${
+            isConnected && (equipmentPositions.length > 0 || gradeData || opcUaUpdates.length > 0)
+              ? 'bg-green-400 animate-pulse' 
+              : 'bg-slate-500'
+          }`}></div>
+          <span className={`text-sm font-medium ${
+            isConnected && (equipmentPositions.length > 0 || gradeData || opcUaUpdates.length > 0)
+              ? 'text-green-400' 
+              : 'text-slate-400'
+          }`}>
+            {isConnected && (equipmentPositions.length > 0 || gradeData || opcUaUpdates.length > 0)
+              ? 'Live Data Active' 
+              : 'Awaiting Data'}
+          </span>
         </div>
         <p className="text-xs text-slate-400">
-          WebSocket foundation established for real-time 3D visualization and live equipment tracking
+          {isConnected 
+            ? 'Real-time mining data streaming from OPC UA server'
+            : 'Connect to see live equipment positions, grade data, and OPC UA updates'
+          }
         </p>
       </div>
     </div>

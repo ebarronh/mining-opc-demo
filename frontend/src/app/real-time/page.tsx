@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { WebSocketStatus } from '@/components/websocket/WebSocketStatus';
-import { useWebSocket } from '@/hooks/useWebSocket';
+import { useWebSocketContext } from '@/providers/WebSocketProvider';
 import { Box, Activity, MapPin, Thermometer, BarChart3, Eye, EyeOff, Tag } from 'lucide-react';
 import type { EquipmentPosition, GradeData, EquipmentPositionsMessage, GradeDataMessage } from '@/types/websocket';
 import { HelpTarget } from '@/components/educational/HelpTarget';
@@ -102,7 +102,12 @@ const generateMockGradeData = (): GradeData => {
 };
 
 export default function RealTimePage() {
-  const { messageHistory: messages = [], state: connectionState } = useWebSocket();
+  const { 
+    state: connectionState, 
+    equipmentPositions: liveEquipmentPositions, 
+    gradeData: liveGradeData,
+    opcUaUpdates
+  } = useWebSocketContext();
   const [showGradeHeatmap, setShowGradeHeatmap] = useState(false);
   const [showEquipmentLabels, setShowEquipmentLabels] = useState(true);
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -110,20 +115,21 @@ export default function RealTimePage() {
   const [equipmentPositions, setEquipmentPositions] = useState<EquipmentPosition[]>(mockEquipmentPositions);
   const [gradeData, setGradeData] = useState<GradeData | null>(null);
   
-  // Process WebSocket messages
+  // Update equipment positions from WebSocket context
   useEffect(() => {
-    if (!messages || messages.length === 0) return;
-    const latestMessage = messages[messages.length - 1];
-    if (!latestMessage) return;
-    
-    if (latestMessage.type === 'equipment_positions') {
-      const positionsMessage = latestMessage as EquipmentPositionsMessage;
-      setEquipmentPositions(positionsMessage.payload.equipment);
-    } else if (latestMessage.type === 'grade_data') {
-      const gradeMessage = latestMessage as GradeDataMessage;
-      setGradeData(gradeMessage.payload);
+    if (liveEquipmentPositions && liveEquipmentPositions.length > 0) {
+      console.log('Using live equipment positions:', liveEquipmentPositions.length, 'items');
+      setEquipmentPositions(liveEquipmentPositions);
     }
-  }, [messages]);
+  }, [liveEquipmentPositions]);
+  
+  // Update grade data from WebSocket context
+  useEffect(() => {
+    if (liveGradeData) {
+      console.log('Using live grade data');
+      setGradeData(liveGradeData);
+    }
+  }, [liveGradeData]);
   
   // Generate initial grade data
   useEffect(() => {
@@ -258,7 +264,16 @@ export default function RealTimePage() {
           
           {/* Equipment List */}
           <div className="bg-slate-800 border border-slate-600 rounded-xl p-4">
-            <h3 className="text-sm font-semibold text-white mb-3">Equipment Status</h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-white">Equipment Status</h3>
+              <div className="text-xs text-slate-500">
+                {connectionState === 'connected' && liveEquipmentPositions.length > 0 ? (
+                  <span className="text-green-400">Live</span>
+                ) : (
+                  <span className="text-yellow-400">Mock</span>
+                )}
+              </div>
+            </div>
             <div className="space-y-2">
               {equipmentPositions.map(equipment => (
                 <div
@@ -289,6 +304,9 @@ export default function RealTimePage() {
                       {equipment.telemetry.payload !== undefined && (
                         <div>Payload: {equipment.telemetry.payload} tons</div>
                       )}
+                      {equipment.telemetry.temperature !== undefined && (
+                        <div>Temp: {equipment.telemetry.temperature}°C</div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -305,11 +323,20 @@ export default function RealTimePage() {
                 description="Real-time ore grade measurements across the mine pit. Grade represents the concentration of valuable minerals (like gold) in the ore, measured in grams per tonne (g/t). Higher grades mean more valuable ore."
                 category="data"
               >
-                <h3 className="text-sm font-semibold text-white mb-3">
-                  <Tooltip term="grade" showIcon={false}>
-                    Grade Statistics
-                  </Tooltip>
-                </h3>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold text-white">
+                    <Tooltip term="grade" showIcon={false}>
+                      Grade Statistics
+                    </Tooltip>
+                  </h3>
+                  <div className="text-xs text-slate-500">
+                    {connectionState === 'connected' && liveGradeData ? (
+                      <span className="text-green-400">Live</span>
+                    ) : (
+                      <span className="text-yellow-400">Mock</span>
+                    )}
+                  </div>
+                </div>
               </HelpTarget>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
@@ -330,6 +357,35 @@ export default function RealTimePage() {
                     {gradeData.statistics.maxGrade.toFixed(2)}%
                   </span>
                 </div>
+                {gradeData.timestamp && (
+                  <div className="flex justify-between pt-2 border-t border-slate-600">
+                    <span className="text-slate-400">Updated:</span>
+                    <span className="text-slate-300 text-xs">
+                      {new Date(gradeData.timestamp).toLocaleTimeString()}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+          
+          {/* OPC UA Updates */}
+          {opcUaUpdates && opcUaUpdates.length > 0 && (
+            <div className="bg-slate-800 border border-slate-600 rounded-xl p-4">
+              <h3 className="text-sm font-semibold text-white mb-3">Recent OPC UA Updates</h3>
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {opcUaUpdates.slice(0, 10).map((update, index) => (
+                  <div key={`${update.nodeId}-${index}`} className="p-2 bg-slate-700/50 rounded text-xs">
+                    <div className="text-blue-400 font-mono truncate">{update.nodeId}</div>
+                    <div className="flex justify-between mt-1">
+                      <span className="text-white">{String(update.value)}</span>
+                      <span className="text-slate-400">{update.dataType}</span>
+                    </div>
+                    <div className="text-slate-500 text-[10px]">
+                      {new Date(update.timestamp).toLocaleTimeString()}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}
