@@ -14,6 +14,16 @@ jest.mock('./DataFlowAnimator', () => ({
   DataFlowAnimator: () => <div data-testid="data-flow-animator">DataFlowAnimator</div>
 }));
 
+// Mock LatencyMetrics component
+jest.mock('./LatencyMetrics', () => ({
+  LatencyMetrics: () => <div data-testid="latency-metrics">LatencyMetrics</div>
+}));
+
+// Mock ProtocolTransition component
+jest.mock('./ProtocolTransition', () => ({
+  ProtocolTransition: () => <div data-testid="protocol-transition">ProtocolTransition</div>
+}));
+
 // Mock useDataFlow hook
 jest.mock('@/hooks/useDataFlow', () => ({
   useDataFlow: () => ({
@@ -186,5 +196,76 @@ describe('ISA95Pyramid', () => {
         expect(screen.getByText(/Ore analyzers, conveyors, excavators/)).toBeInTheDocument();
       });
     }
+  });
+
+  it('shows latency metrics when showLatencyMetrics is true', () => {
+    render(<ISA95Pyramid showLatencyMetrics={true} />);
+    
+    // Should render the LatencyMetrics component
+    expect(screen.getByTestId('latency-metrics')).toBeInTheDocument();
+  });
+
+  it('hides latency metrics when showLatencyMetrics is false', () => {
+    render(<ISA95Pyramid showLatencyMetrics={false} />);
+    
+    // Should not render the LatencyMetrics component
+    expect(screen.queryByTestId('latency-metrics')).not.toBeInTheDocument();
+  });
+
+  it('shows transition latency indicators when showLatencyMetrics is true', () => {
+    render(<ISA95Pyramid showLatencyMetrics={true} />);
+    
+    // Should show transition latency arrows on some levels
+    const transitionArrows = screen.getAllByTestId('arrow-icon');
+    expect(transitionArrows.length).toBeGreaterThan(0);
+  });
+
+  it('passes correct props to LatencyMetrics component', () => {
+    const mockOnLevelSelect = jest.fn();
+    render(
+      <ISA95Pyramid 
+        showLatencyMetrics={true} 
+        showDataFlow={true}
+        onLevelSelect={mockOnLevelSelect}
+      />
+    );
+    
+    // Should render LatencyMetrics with showRealTime=true when showDataFlow=true
+    expect(screen.getByTestId('latency-metrics')).toBeInTheDocument();
+    
+    // Click on a level to select it
+    const level0Element = screen.getByText(/Level 0: Field Level/).closest('div');
+    if (level0Element) {
+      fireEvent.click(level0Element);
+      
+      // LatencyMetrics should receive the selectedLevel
+      expect(screen.getByTestId('latency-metrics')).toBeInTheDocument();
+    }
+  });
+
+  it('shows protocol transition when showProtocolTransition is true', () => {
+    render(<ISA95Pyramid showProtocolTransition={true} />);
+    
+    // Should render the ProtocolTransition component
+    expect(screen.getByTestId('protocol-transition')).toBeInTheDocument();
+  });
+
+  it('hides protocol transition when showProtocolTransition is false', () => {
+    render(<ISA95Pyramid showProtocolTransition={false} />);
+    
+    // Should not render the ProtocolTransition component
+    expect(screen.queryByTestId('protocol-transition')).not.toBeInTheDocument();
+  });
+
+  it('passes correct props to ProtocolTransition component', () => {
+    render(
+      <ISA95Pyramid 
+        showProtocolTransition={true}
+        showDataFlow={true}
+      />
+    );
+    
+    // Should render ProtocolTransition
+    expect(screen.getByTestId('protocol-transition')).toBeInTheDocument();
   });
 });

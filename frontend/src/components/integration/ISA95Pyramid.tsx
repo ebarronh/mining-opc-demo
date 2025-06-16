@@ -4,6 +4,8 @@ import React, { useState, useCallback } from 'react';
 import { ISA95Level } from '@/types/integration';
 import { DataFlowAnimator } from './DataFlowAnimator';
 import { DataTransformationExamples } from './DataTransformationExamples';
+import { LatencyMetrics } from './LatencyMetrics';
+import { ProtocolTransition } from './ProtocolTransition';
 import { useDataFlow } from '@/hooks/useDataFlow';
 import { 
   Cpu, 
@@ -29,7 +31,12 @@ const ISA95_LEVELS: ISA95Level[] = [
     protocols: ['OPC UA', 'Modbus', 'Ethernet/IP', 'Serial'],
     latency: '1-10ms',
     dataVolume: '10-100 points/sec',
-    securityBoundary: false
+    securityBoundary: false,
+    transitionLatencies: {
+      toNext: '5-15ms',
+      toEdge: '2-8ms',
+      toCloud: 'N/A'
+    }
   },
   {
     id: 1,
@@ -40,7 +47,13 @@ const ISA95_LEVELS: ISA95Level[] = [
     protocols: ['OPC UA', 'Ethernet/IP', 'Profinet', 'Modbus TCP'],
     latency: '10-50ms',
     dataVolume: '1-10 aggregates/sec',
-    securityBoundary: true
+    securityBoundary: true,
+    transitionLatencies: {
+      toPrevious: '5-15ms',
+      toNext: '20-50ms',
+      toEdge: '3-12ms',
+      toCloud: 'N/A'
+    }
   },
   {
     id: 2,
@@ -51,7 +64,13 @@ const ISA95_LEVELS: ISA95Level[] = [
     protocols: ['OPC UA', 'REST API', 'Database queries', 'Web services'],
     latency: '100ms-1s',
     dataVolume: '1 update/sec',
-    securityBoundary: true
+    securityBoundary: true,
+    transitionLatencies: {
+      toPrevious: '20-50ms',
+      toNext: '100ms-1s',
+      toEdge: '5-20ms',
+      toCloud: '50-150ms'
+    }
   },
   {
     id: 3,
@@ -62,7 +81,13 @@ const ISA95_LEVELS: ISA95Level[] = [
     protocols: ['REST API', 'SOAP', 'Database integration', 'Message queues'],
     latency: '1-10s',
     dataVolume: '1 batch/minute',
-    securityBoundary: true
+    securityBoundary: true,
+    transitionLatencies: {
+      toPrevious: '100ms-1s',
+      toNext: '1-10s',
+      toEdge: 'N/A',
+      toCloud: '100-300ms'
+    }
   },
   {
     id: 4,
@@ -73,7 +98,13 @@ const ISA95_LEVELS: ISA95Level[] = [
     protocols: ['REST API', 'EDI', 'Database replication', 'File transfer'],
     latency: '10s-1min',
     dataVolume: '1 report/hour',
-    securityBoundary: true
+    securityBoundary: true,
+    transitionLatencies: {
+      toPrevious: '1-10s',
+      toNext: '10s-5min',
+      toEdge: 'N/A',
+      toCloud: '200-500ms'
+    }
   },
   {
     id: 5,
@@ -84,7 +115,13 @@ const ISA95_LEVELS: ISA95Level[] = [
     protocols: ['Data lakes', 'ETL pipelines', 'API integration', 'Cloud services'],
     latency: '1min-1hour',
     dataVolume: '1 analysis/day',
-    securityBoundary: true
+    securityBoundary: true,
+    transitionLatencies: {
+      toPrevious: '10s-5min',
+      toNext: 'N/A',
+      toEdge: 'N/A',
+      toCloud: '500ms-2s'
+    }
   }
 ];
 
@@ -130,13 +167,17 @@ interface ISA95PyramidProps {
   onLevelSelect?: (level: ISA95Level) => void;
   showDataFlow?: boolean;
   followDataMode?: boolean;
+  showLatencyMetrics?: boolean;
+  showProtocolTransition?: boolean;
 }
 
 export const ISA95Pyramid: React.FC<ISA95PyramidProps> = ({
   className = '',
   onLevelSelect,
   showDataFlow = false,
-  followDataMode = false
+  followDataMode = false,
+  showLatencyMetrics = false,
+  showProtocolTransition = false
 }) => {
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
   const [hoveredLevel, setHoveredLevel] = useState<number | null>(null);
@@ -276,6 +317,12 @@ export const ISA95Pyramid: React.FC<ISA95PyramidProps> = ({
                         <Database className="w-3 h-3" />
                         <span>{level.dataVolume}</span>
                       </div>
+                      {showLatencyMetrics && level.transitionLatencies?.toNext && (
+                        <div className="flex items-center space-x-1 mt-1">
+                          <ArrowUpDown className="w-3 h-3 text-blue-400" />
+                          <span className="text-blue-300">{level.transitionLatencies.toNext}</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -315,6 +362,26 @@ export const ISA95Pyramid: React.FC<ISA95PyramidProps> = ({
         <div className="mt-12">
           <DataTransformationExamples selectedLevel={selectedLevel} />
         </div>
+
+        {/* Latency Metrics */}
+        {showLatencyMetrics && (
+          <div className="mt-12">
+            <LatencyMetrics 
+              selectedLevel={selectedLevel}
+              showRealTime={showDataFlow}
+            />
+          </div>
+        )}
+
+        {/* Protocol Transition */}
+        {showProtocolTransition && (
+          <div className="mt-12">
+            <ProtocolTransition 
+              animateFlow={showDataFlow && isActive}
+              showDetails={true}
+            />
+          </div>
+        )}
 
         {/* Legend */}
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">

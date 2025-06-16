@@ -10,6 +10,12 @@ export interface ISA95Level {
   latency: string;
   dataVolume: string;
   securityBoundary: boolean;
+  transitionLatencies?: {
+    toNext?: string;
+    toPrevious?: string;
+    toEdge?: string;
+    toCloud?: string;
+  };
 }
 
 export interface DataFlowNode {

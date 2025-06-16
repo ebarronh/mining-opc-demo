@@ -5,6 +5,12 @@
 - `frontend/src/components/integration/ISA95Pyramid.tsx` - Interactive ISA-95 pyramid visualization with data flow animation
 - `frontend/src/components/integration/ISA95Pyramid.test.tsx` - Unit tests for ISA95Pyramid component
 - `frontend/src/components/integration/DataFlowAnimator.tsx` - Particle-based animation system for showing data movement
+- `frontend/src/components/integration/DataTransformationExamples.tsx` - Data transformation examples at each ISA-95 level
+- `frontend/src/components/integration/DataTransformationExamples.test.tsx` - Unit tests for DataTransformationExamples component
+- `frontend/src/components/integration/LatencyMetrics.tsx` - Detailed latency metrics display across ISA-95 levels
+- `frontend/src/components/integration/LatencyMetrics.test.tsx` - Unit tests for LatencyMetrics component
+- `frontend/src/components/integration/ProtocolTransition.tsx` - Protocol transition visualization (OPC UA → REST → Delta Share)
+- `frontend/src/components/integration/ProtocolTransition.test.tsx` - Unit tests for ProtocolTransition component
 - `frontend/src/components/integration/FleetIntegration.tsx` - Fleet management system integration showcase
 - `frontend/src/components/integration/FleetIntegration.test.tsx` - Unit tests for FleetIntegration component
 - `frontend/src/components/integration/OracleConnector.tsx` - Oracle cloud integration demonstration
@@ -42,10 +48,10 @@
 
 - [ ] 1.0 Create ISA-95 Integration Visualization System
   - [x] 1.1 Design and implement ISA95Pyramid component with interactive levels 0-5
-  - [ ] 1.2 Create DataFlowAnimator for particle-based data movement visualization
-  - [ ] 1.3 Implement data transformation examples at each ISA-95 level
-  - [ ] 1.4 Add latency metrics display (e.g., "20ms sensor → edge")
-  - [ ] 1.5 Build protocol transition visualization (OPC UA → REST → Delta Share)
+  - [x] 1.2 Create DataFlowAnimator for particle-based data movement visualization
+  - [x] 1.3 Implement data transformation examples at each ISA-95 level
+  - [x] 1.4 Add latency metrics display (e.g., "20ms sensor → edge")
+  - [x] 1.5 Build protocol transition visualization (OPC UA → REST → Delta Share)
   - [ ] 1.6 Implement "Follow the Data" mode to trace single ore reading through all levels
   - [ ] 1.7 Add tooltips explaining each ISA-95 level in mining context
   - [ ] 1.8 Create bi-directional data flow animations for control commands

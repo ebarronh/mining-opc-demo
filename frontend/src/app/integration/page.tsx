@@ -26,6 +26,8 @@ export default function IntegrationPage() {
       <div className="mb-8">
         <ISA95Pyramid 
           showDataFlow={true}
+          showLatencyMetrics={true}
+          showProtocolTransition={true}
         />
       </div>
 
