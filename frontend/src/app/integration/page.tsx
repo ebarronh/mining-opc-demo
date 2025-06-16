@@ -1,5 +1,5 @@
 import { AppLayout } from '@/components/layout/AppLayout'
-import { LinkIcon, Building2, BarChart3, Workflow } from 'lucide-react'
+import { Building2, BarChart3, Workflow } from 'lucide-react'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -10,26 +10,15 @@ export const metadata: Metadata = {
 export default function IntegrationPage() {
   return (
     <AppLayout>
-      {/* Hero Section */}
-      <div className="mb-8">
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="p-2 bg-purple-500/10 rounded-lg">
-            <LinkIcon className="w-6 h-6 text-purple-400" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold text-white">Integration Hub</h1>
-            <p className="text-slate-400">ISA-95 enterprise integration and FMS connectivity</p>
-          </div>
+      {/* Status Banner */}
+      <div className="mb-8 bg-purple-500/10 border border-purple-500/20 rounded-lg p-4">
+        <div className="flex items-center space-x-2 mb-2">
+          <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+          <span className="text-purple-400 font-medium">Coming in Phase 5</span>
         </div>
-        <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4">
-          <div className="flex items-center space-x-2 mb-2">
-            <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-            <span className="text-purple-400 font-medium">Coming in Phase 5</span>
-          </div>
-          <p className="text-purple-300 text-sm">
-            Enterprise integration with ISA-95 flow diagrams and Fleet Management System connectivity
-          </p>
-        </div>
+        <p className="text-purple-300 text-sm">
+          Enterprise integration with ISA-95 flow diagrams and Fleet Management System connectivity
+        </p>
       </div>
 
       {/* Feature Preview Grid */}

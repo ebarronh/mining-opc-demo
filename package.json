@@ -33,6 +33,7 @@
     "demo:stop": "pnpm docker:down",
     "validate:demo": "node validation/puppeteer-validation.js",
     "validate:phase3": "node validation/phase3-puppeteer.js",
+    "validate:phase4": "node validation/phase4-puppeteer.js",
     "setup": "node scripts/dev-setup.js",
     "health": "node scripts/health-check.js",
     "stats": "node scripts/project-stats.js"

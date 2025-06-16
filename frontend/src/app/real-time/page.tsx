@@ -5,7 +5,7 @@ import nextDynamic from 'next/dynamic';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { WebSocketStatus } from '@/components/websocket/WebSocketStatus';
 import { useWebSocketContext } from '@/providers/WebSocketProvider';
-import { Box, Activity, MapPin, Thermometer, BarChart3, Eye, EyeOff, Tag } from 'lucide-react';
+import { Box, Activity, MapPin, Thermometer, Eye, EyeOff, Tag } from 'lucide-react';
 import type { EquipmentPosition, GradeData, EquipmentPositionsMessage, GradeDataMessage } from '@/types/websocket';
 import { HelpTarget } from '@/components/educational/HelpTarget';
 import { Tooltip } from '@/components/educational/Tooltip';
@@ -170,21 +170,9 @@ export default function RealTimePage() {
   
   return (
     <AppLayout>
-      {/* Header Section */}
-      <div className="mb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-500/10 rounded-lg">
-              <BarChart3 className="w-6 h-6 text-blue-400" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-white">Real-time Monitor</h1>
-              <p className="text-slate-400">3D mine pit visualization with live equipment tracking</p>
-            </div>
-          </div>
-          
-          {/* Control Buttons */}
-          <div className="flex items-center space-x-2">
+      {/* Control Buttons */}
+      <div className="mb-4 flex justify-end">
+        <div className="flex items-center space-x-2">
             <button
               onClick={toggleGradeHeatmap}
               className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
@@ -208,7 +196,6 @@ export default function RealTimePage() {
               <Tag className={`w-4 h-4 ${!showEquipmentLabels ? 'opacity-50' : ''}`} />
               <span>Labels</span>
             </button>
-          </div>
         </div>
       </div>
       

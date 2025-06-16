@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { OpcUaNode, OpcUaUpdate } from '@/types/websocket';
 import { 
   Copy, 
@@ -9,7 +9,8 @@ import {
   BellOff,
   RefreshCw,
   Info,
-  Activity
+  Activity,
+  HelpCircle
 } from 'lucide-react';
 
 interface NodeDetailsProps {
@@ -192,6 +193,8 @@ export default function NodeDetails({
 }: NodeDetailsProps) {
   const [copied, setCopied] = useState(false);
   const [updateAnimation, setUpdateAnimation] = useState(false);
+  const [showSubscriptionHelp, setShowSubscriptionHelp] = useState(false);
+  const helpTooltipRef = useRef<HTMLDivElement>(null);
   
   // Trigger animation on value update
   useEffect(() => {
@@ -201,6 +204,20 @@ export default function NodeDetails({
       return () => clearTimeout(timer);
     }
   }, [lastUpdate]);
+
+  // Close help tooltip when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (helpTooltipRef.current && !helpTooltipRef.current.contains(event.target as Node)) {
+        setShowSubscriptionHelp(false);
+      }
+    };
+
+    if (showSubscriptionHelp) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showSubscriptionHelp]);
   
   const handleCopyNodeId = async () => {
     if (!node) return;
@@ -252,28 +269,98 @@ export default function NodeDetails({
           </div>
           
           {node.nodeClass === 'Variable' && (
-            <button
-              onClick={handleToggleSubscription}
-              className={`
-                flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm transition-colors
-                ${isSubscribed 
-                  ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
-                  : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
-                }
-              `}
-            >
-              {isSubscribed ? (
-                <>
-                  <Bell className="w-4 h-4" />
-                  <span>Subscribed</span>
-                </>
-              ) : (
-                <>
-                  <BellOff className="w-4 h-4" />
-                  <span>Subscribe</span>
-                </>
-              )}
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={handleToggleSubscription}
+                className={`
+                  flex items-center space-x-2 px-3 py-1.5 rounded-md text-sm transition-colors
+                  ${isSubscribed 
+                    ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
+                    : 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                  }
+                `}
+              >
+                {isSubscribed ? (
+                  <>
+                    <Bell className="w-4 h-4" />
+                    <span>Subscribed</span>
+                  </>
+                ) : (
+                  <>
+                    <BellOff className="w-4 h-4" />
+                    <span>Subscribe</span>
+                  </>
+                )}
+              </button>
+              
+              {/* Subscription Help Button */}
+              <div className="relative" ref={helpTooltipRef}>
+                <button
+                  onClick={() => setShowSubscriptionHelp(!showSubscriptionHelp)}
+                  className="p-1.5 text-gray-400 hover:text-gray-300 hover:bg-slate-700 rounded transition-colors"
+                  title="How subscriptions work in production"
+                >
+                  <HelpCircle className="w-4 h-4" />
+                </button>
+                
+                {/* Help Tooltip */}
+                {showSubscriptionHelp && (
+                  <div className="absolute right-0 top-8 w-96 bg-slate-900 border border-slate-600 rounded-lg shadow-xl z-50 p-4">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-semibold text-white">Real-World OPC UA Subscriptions</h4>
+                        <button
+                          onClick={() => setShowSubscriptionHelp(false)}
+                          className="text-gray-400 hover:text-gray-300"
+                        >
+                          ×
+                        </button>
+                      </div>
+                      
+                      <div className="text-xs text-gray-300 space-y-2">
+                        <p className="text-yellow-400 font-medium">In production mining systems, subscribing means:</p>
+                        
+                        <div className="space-y-1.5">
+                          <div className="flex items-start space-x-2">
+                            <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-1.5 flex-shrink-0"></div>
+                            <span><strong>Historian Database:</strong> Values automatically logged to time-series databases (OSIsoft PI, Wonderware)</span>
+                          </div>
+                          
+                          <div className="flex items-start space-x-2">
+                            <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-1.5 flex-shrink-0"></div>
+                            <span><strong>Real-time Notifications:</strong> Email, SMS, or mobile alerts for critical values (e.g., high-grade ore detection)</span>
+                          </div>
+                          
+                          <div className="flex items-start space-x-2">
+                            <div className="w-1.5 h-1.5 bg-purple-400 rounded-full mt-1.5 flex-shrink-0"></div>
+                            <span><strong>Control Room Displays:</strong> SCADA/HMI screens update automatically in real-time</span>
+                          </div>
+                          
+                          <div className="flex items-start space-x-2">
+                            <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mt-1.5 flex-shrink-0"></div>
+                            <span><strong>Enterprise Integration:</strong> Updates flow to ERP, fleet management, and resource planning systems</span>
+                          </div>
+                          
+                          <div className="flex items-start space-x-2">
+                            <div className="w-1.5 h-1.5 bg-red-400 rounded-full mt-1.5 flex-shrink-0"></div>
+                            <span><strong>Alarm Management:</strong> Automatic escalation procedures and work order creation</span>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-3 p-2 bg-slate-800 border border-slate-700 rounded">
+                          <p className="text-yellow-300 text-xs font-medium mb-1">Example: Geologist subscribes to ore grade</p>
+                          <p className="text-xs">When grade changes: PI Historian logs it → Control room updates → Mobile alert for high grades → Resource model updates → Fleet management adjusts routes</p>
+                        </div>
+                        
+                        <p className="text-gray-400 text-xs italic mt-2">
+                          Note: System integrators configure notification rules, database connections, and alarm thresholds during implementation.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           )}
         </div>
       </div>

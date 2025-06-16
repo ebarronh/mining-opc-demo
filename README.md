@@ -107,14 +107,18 @@ docker-compose up --build
 - Compliance with OPC UA Mining Companion Specification v1.0
 
 ### 2. **3D Real-Time Dashboard**
-- Three.js mine pit visualization
-- Equipment avatars with live positioning
-- Grade heatmap overlay with real-time updates
+- **Three.js Visualization**: Interactive 3D mine pit with equipment models
+- **Equipment Tracking**: Real-time positioning of excavators, trucks, conveyors
+- **Grade Heatmap**: Toggle-able 20x20 grid overlay with color-coded ore grades
+- **Camera Controls**: Keyboard shortcuts (R=reset, G=grade toggle, E=equipment focus, H=help, F=fullscreen)
+- **Performance Optimized**: LOD rendering, frustum culling, 30+ FPS on Intel UHD Graphics
 
 ### 3. **OPC UA Explorer**
-- Interactive tree view of server address space
-- Live value subscription with badge indicators
-- Browse and discover mining equipment nodes
+- **Tree Navigation**: Hierarchical address space browser with virtual scrolling
+- **Live Subscriptions**: Real-time value updates with subscription management
+- **Node Details**: Complete OPC UA node information with data type interpretation
+- **Code Examples**: Auto-generated JavaScript, Python, and REST API examples
+- **Search & Filter**: Debounced search with fuzzy matching for large node trees
 
 ### 4. **Integration Hub**
 - ISA-95 swim-lane visualization
@@ -126,10 +130,17 @@ docker-compose up --build
 - Regional regulatory compliance tracking
 - Audit trail and certification status
 
-### 6. **Demo Scenarios**
+### 6. **Educational Features**
+- **Mining Glossary**: 50+ industry terms with search and explanations
+- **Interactive Tooltips**: Contextual help for mining concepts and values
+- **Help Mode**: Guided tutorial with click targets for new users
+- **Progress Tracking**: Remembers which educational content has been viewed
+
+### 7. **Demo Scenarios**
 - Trigger "high-grade discovery" events
 - Simulate equipment failure scenarios
 - Performance metrics and KPI tracking
+- Real-time 3D equipment movement and status changes
 
 ## 🛠️ Technology Stack
 
@@ -141,11 +152,13 @@ docker-compose up --build
 - **Testing**: Jest with ts-jest
 
 ### Frontend
-- **Framework**: Next.js 14 with App Router
+- **Framework**: Next.js 15.4.0 with App Router
 - **Styling**: Tailwind CSS + Radix UI
-- **3D Graphics**: @react-three/fiber (Three.js)
-- **State**: React Query + Zustand
-- **WebSocket**: native WebSocket API
+- **3D Graphics**: Three.js with @react-three/fiber, @react-three/drei
+- **State Management**: React Query + Context API
+- **WebSocket**: Native WebSocket API with reconnection
+- **Syntax Highlighting**: react-syntax-highlighter for code examples
+- **Performance**: Virtual scrolling, LOD rendering, frustum culling
 
 ### Infrastructure
 - **Containerization**: Docker + Docker Compose
@@ -172,6 +185,72 @@ docker-compose up --build
 - **ISA-95 / IEC 62264**: Enterprise-control integration
 - **Industry 4.0**: Secure sensor-to-cloud connectivity
 
+## 🎮 3D Controls & Interaction
+
+### Keyboard Shortcuts
+- **R** - Reset camera to default position
+- **G** - Toggle grade heatmap overlay
+- **E** - Focus camera on selected equipment
+- **H** - Toggle help mode for educational features
+- **F** - Toggle fullscreen mode
+- **Double-click** - Focus on equipment or terrain feature
+
+### Mouse Controls
+- **Left drag** - Rotate camera around mine pit
+- **Right drag** - Pan camera view
+- **Scroll wheel** - Zoom in/out
+- **Hover** - Show equipment tooltips with live data
+
+## 📡 WebSocket Message Formats
+
+### Equipment Position Updates
+```json
+{
+  "type": "equipment_positions",
+  "data": [
+    {
+      "id": "excavator-001",
+      "x": 245.6, "y": 12.3, "z": -87.4,
+      "status": "operational",
+      "type": "excavator",
+      "currentLoad": 85,
+      "efficiency": 92.5
+    }
+  ]
+}
+```
+
+### Grade Heatmap Data
+```json
+{
+  "type": "grade_data",
+  "data": {
+    "timestamp": 1703123456789,
+    "grid": [
+      [2.1, 2.3, 2.8, ...],
+      [1.9, 2.1, 2.4, ...],
+      ...
+    ]
+  }
+}
+```
+
+### OPC UA Node Updates
+```json
+{
+  "type": "opcua_updates",
+  "data": [
+    {
+      "nodeId": "ns=2;s=Equipment.Excavator001.OreGrade",
+      "value": 3.45,
+      "timestamp": 1703123456789,
+      "dataType": "Double",
+      "unit": "g/t Au"
+    }
+  ]
+}
+```
+
 ## 🧪 Testing & Validation
 
 ### OPC UA Client Testing
@@ -195,8 +274,8 @@ pnpm --filter backend test
 # Frontend component tests
 pnpm --filter frontend test
 
-# E2E scenarios (requires running services)
-pnpm test:e2e
+# Phase 4 validation (requires both servers running)
+node validation/phase4-puppeteer.js
 ```
 
 ## 📁 Project Structure
@@ -206,8 +285,10 @@ mining-opc-demo/
 ├── backend/                 # OPC UA server & API
 │   ├── src/
 │   │   ├── server.ts       # Main OPC UA server
-│   │   ├── mining/         # Mining information models
-│   │   └── api/            # REST API endpoints
+│   │   ├── addressSpace/   # Mining OPC UA models
+│   │   ├── api/            # REST API endpoints
+│   │   ├── simulation/     # Grade & equipment simulation
+│   │   └── websocket/      # WebSocket message handlers
 │   ├── tests/              # Backend unit tests
 │   ├── Dockerfile          # Backend container
 │   └── package.json        # Backend dependencies
@@ -215,10 +296,18 @@ mining-opc-demo/
 │   ├── src/
 │   │   ├── app/            # App router pages
 │   │   ├── components/     # React components
-│   │   └── lib/            # Utilities & hooks
+│   │   │   ├── three/      # 3D visualization
+│   │   │   ├── opcua/      # OPC UA explorer
+│   │   │   └── educational/ # Learning features
+│   │   ├── hooks/          # Custom React hooks
+│   │   ├── providers/      # Context providers
+│   │   └── types/          # TypeScript definitions
 │   ├── tests/              # Frontend tests
 │   ├── Dockerfile          # Frontend container
 │   └── package.json        # Frontend dependencies
+├── validation/             # Puppeteer validation scripts
+│   ├── phase3-puppeteer.js # Phase 3 validation
+│   └── phase4-puppeteer.js # Phase 4 validation
 ├── docs/                   # Documentation
 │   ├── standards/          # OPC UA & ISA-95 research
 │   ├── tooling/            # Technology decisions

@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import nextDynamic from 'next/dynamic';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { Globe } from 'lucide-react';
 import { OpcUaNode } from '@/types/websocket';
 import { useWebSocketContext } from '@/providers/WebSocketProvider';
 
@@ -270,26 +269,13 @@ export default function ExplorerPage() {
   
   return (
     <AppLayout>
-      {/* Header Section */}
-      <div className="mb-6">
-        <div className="flex items-center space-x-3">
-          <div className="p-2 bg-green-500/10 rounded-lg">
-            <Globe className="w-6 h-6 text-green-400" />
-          </div>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-white">OPC UA Explorer</h1>
-            <p className="text-slate-400">Browse mining equipment nodes and explore the OPC UA address space</p>
-          </div>
-        </div>
-        
-        {/* Quick Introduction */}
-        <div className="mt-4 p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
-          <p className="text-sm text-gray-300">
-            <strong className="text-white">Getting Started:</strong> This explorer allows you to browse the real-time data structure of the mining operation. 
-            Click on folders to expand them, select variables to see their current values, and subscribe to receive live updates. 
-            Look for the <span className="text-yellow-400">yellow-highlighted mining equipment nodes</span> for the most relevant operational data.
-          </p>
-        </div>
+      {/* Quick Introduction */}
+      <div className="mb-6 p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
+        <p className="text-sm text-gray-300">
+          <strong className="text-white">Getting Started:</strong> This explorer allows you to browse the real-time data structure of the mining operation. 
+          Click on folders to expand them, select variables to see their current values, and subscribe to receive live updates. 
+          Look for the <span className="text-yellow-400">yellow-highlighted mining equipment nodes</span> for the most relevant operational data.
+        </p>
       </div>
       
       {/* Main Content */}

@@ -11,15 +11,17 @@ Executive-ready, standards-based real-time ore intelligence platform showcasing 
 - ✅ Dark theme with mining-specific visual identity
 - ✅ Puppeteer validation script
 
-## Phase 4: 3D Visualization & OPC UA Explorer (IN PROGRESS)
+## Phase 4: 3D Visualization & OPC UA Explorer (COMPLETED)
 - ✅ Three.js 3D mine scene with equipment visualization
 - ✅ Grade heatmap overlay with toggle functionality
-- ✅ Camera controls with keyboard shortcuts
-- ✅ OPC UA Explorer with tree navigation
-- ✅ Node details panel with value interpretation
-- ✅ Code examples for JavaScript, Python, and REST API
-- ✅ Educational context for mining values (ore grades, weights, production)
+- ✅ Camera controls with keyboard shortcuts (R, G, E, H, F keys)
+- ✅ OPC UA Explorer with tree navigation and virtual scrolling
+- ✅ Node details panel with value interpretation and subscription management
+- ✅ Code examples for JavaScript, Python, and REST API with syntax highlighting
+- ✅ Educational features: glossary, tooltips, and help mode
+- ✅ Performance optimizations: LOD, frustum culling, instancing
 - ✅ Comprehensive test suite with pre-commit hooks
+- ✅ Puppeteer validation script for Phase 4
 
 ## Development Commands
 
@@ -113,23 +115,40 @@ pnpm validate:phase3
 # Output: validation/phase3-shell.png
 ```
 
+### Phase 4 Validation
+```bash
+# Run Phase 4 Puppeteer validation (requires both frontend and backend running)
+node validation/phase4-puppeteer.js
+
+# Validates 3D scene, equipment, heatmap, OPC UA explorer
+# Output: validation/phase4-realtime.png, phase4-explorer.png, phase4-complete.png
+```
+
 ## Architecture
 
 ### Frontend Stack
 - **Framework**: Next.js 15.4.0 (App Router)
 - **Styling**: Tailwind CSS with executive dark theme
 - **UI Components**: Radix UI for professional navigation
+- **3D Graphics**: Three.js with @react-three/fiber and @react-three/drei
 - **TypeScript**: Full type safety
 - **Testing**: Jest + React Testing Library
 - **Icons**: Lucide React
+- **Syntax Highlighting**: react-syntax-highlighter
 
 ### Key Components
 - `AppLayout`: Main layout wrapper with navigation
 - `MainNavigation`: Radix UI tabs with live status
 - `SystemStatus`: Phase 2 backend integration
 - `WebSocketStatus`: Real-time connection monitoring
+- `MineScene`: Three.js 3D mine visualization with equipment
+- `OpcUaExplorer`: Tree navigation with virtual scrolling
+- `NodeDetails`: OPC UA node details with subscription management
+- `Glossary`: Educational mining terms with search
+- `HelpModeProvider`: Context for educational help mode
 - `useSystemStatus`: Backend health API hook
 - `useWebSocket`: WebSocket client with reconnection
+- `useThree`: Three.js performance monitoring utilities
 
 ### Styling System
 - **Executive Theme**: Professional dark theme with mining colors
@@ -165,17 +184,40 @@ frontend/
 │   │   ├── three/            # 3D visualization components
 │   │   │   ├── MineScene.tsx # Main 3D scene container
 │   │   │   ├── Equipment.tsx # 3D equipment models
+│   │   │   ├── InstancedEquipment.tsx # Performance optimized equipment
+│   │   │   ├── LODEquipment.tsx # Level of detail equipment
 │   │   │   ├── GradeHeatmap.tsx # Grade overlay visualization
-│   │   │   └── CameraControls.tsx # Camera interaction
-│   │   └── opcua/            # OPC UA Explorer components
-│   │       ├── OpcUaExplorer.tsx # Tree navigation
-│   │       ├── NodeDetails.tsx # Node information panel
-│   │       └── CodeExamples.tsx # Code snippet generator
+│   │   │   ├── CameraControls.tsx # Camera interaction
+│   │   │   ├── CameraControlsUI.tsx # Keyboard shortcuts UI
+│   │   │   └── PerformanceMonitor.tsx # FPS and memory monitoring
+│   │   ├── opcua/            # OPC UA Explorer components
+│   │   │   ├── OpcUaExplorer.tsx # Tree navigation
+│   │   │   ├── VirtualizedTree.tsx # Performance virtual tree
+│   │   │   ├── NodeDetails.tsx # Node information panel
+│   │   │   ├── CodeExamples.tsx # Code snippet generator
+│   │   │   └── SyntaxHighlighter.tsx # Code syntax highlighting
+│   │   ├── educational/      # Educational features
+│   │   │   ├── Glossary.tsx  # Mining terms glossary
+│   │   │   ├── Tooltip.tsx   # Educational tooltips
+│   │   │   └── HelpTarget.tsx # Help mode targets
+│   │   └── ui/               # UI components
+│   │       └── GradeLegend.tsx # Grade color legend
 │   ├── hooks/                # Custom React hooks
 │   │   ├── useSystemStatus.ts # Backend health integration
-│   │   └── useWebSocket.ts    # WebSocket client hook
-│   └── providers/            # React context providers
-│       └── WebSocketProvider.tsx # WebSocket context
+│   │   ├── useWebSocket.ts    # WebSocket client hook
+│   │   ├── useThree.ts        # Three.js utilities
+│   │   ├── useDebounce.ts     # Debouncing utility
+│   │   ├── useFrustumCulling.ts # 3D performance optimization
+│   │   ├── useOpcUaCache.ts   # OPC UA data caching
+│   │   └── useBatchedSubscriptions.ts # OPC UA subscription batching
+│   ├── providers/            # React context providers
+│   │   ├── WebSocketProvider.tsx # WebSocket context
+│   │   ├── HelpModeProvider.tsx # Educational help mode context
+│   │   └── ClientProviders.tsx # Combined client providers
+│   ├── data/                 # Static data
+│   │   └── miningTerms.ts    # Mining terminology definitions
+│   └── types/                # TypeScript type definitions
+│       └── websocket.ts      # WebSocket message types
 ├── validation/               # Phase validation scripts
 └── package.json             # Frontend dependencies
 ```
@@ -202,8 +244,8 @@ pnpm dev
 
 ### 3. Validation
 ```bash
-# Before committing, run validation
-pnpm validate:phase3
+# Run Phase 4 validation (requires both servers running)
+node validation/phase4-puppeteer.js
 
 # Ensure all tests pass
 pnpm test
@@ -236,19 +278,62 @@ git push origin main
 - `style:` Formatting changes
 - `chore:` Maintenance tasks
 
-## Phase 4 Preparation
+## Phase 4 Features
 
-### WebSocket Foundation
-- Full WebSocket client implementation ready
-- Mining-specific message types defined
-- Reconnection logic with exponential backoff
-- Message history and subscription management
+### 3D Mine Visualization
+- **Three.js Scene**: Real-time 3D mine pit with equipment
+- **Equipment Models**: Excavators, trucks, conveyors with status colors
+- **Grade Heatmap**: 20x20 grid overlay with toggle and legend
+- **Camera Controls**: Keyboard shortcuts (R=reset, G=toggle grade, E=equipment focus, H=help, F=fullscreen)
+- **Performance**: LOD, frustum culling, instancing for 30+ FPS
 
-### 3D Visualization Readiness
-- Component structure established
-- Real-time data hooks implemented
-- Professional UI framework in place
-- Executive-ready visual quality achieved
+### OPC UA Explorer
+- **Tree Navigation**: Hierarchical OPC UA address space browser
+- **Virtual Scrolling**: Handles 1000+ nodes efficiently
+- **Node Details**: Live values, subscription management, data type info
+- **Production Context**: Help tooltips explaining how subscriptions work in real mining systems
+- **Code Examples**: JavaScript, Python, REST API with syntax highlighting
+- **Search**: Debounced filtering with fuzzy matching
+
+### Educational Features
+- **Glossary**: 50+ mining terms with search and alphabetical navigation
+- **Tooltips**: Contextual explanations for mining concepts
+- **Help Mode**: Interactive tutorial with click targets
+- **Progress Tracking**: localStorage for seen educational content
+
+### WebSocket Message Types
+```typescript
+// Real-time equipment position updates
+type EquipmentPositionMessage = {
+  type: 'equipment_positions';
+  data: Array<{
+    id: string;
+    x: number; y: number; z: number;
+    status: 'operational' | 'maintenance' | 'error';
+    type: 'excavator' | 'truck' | 'conveyor';
+  }>;
+};
+
+// Grade heatmap data updates
+type GradeDataMessage = {
+  type: 'grade_data';
+  data: {
+    timestamp: number;
+    grid: number[][]; // 20x20 grade values
+  };
+};
+
+// OPC UA node value changes
+type OpcUaUpdateMessage = {
+  type: 'opcua_updates';
+  data: Array<{
+    nodeId: string;
+    value: any;
+    timestamp: number;
+    dataType: string;
+  }>;
+};
+```
 
 ## Troubleshooting
 
@@ -279,12 +364,12 @@ pnpm dev:frontend
 - Check port 3000 is not blocked
 - Run with headless: false for debugging
 
-## Next Steps (Phase 4)
-1. 3D mine pit visualization with Three.js
-2. Real-time equipment tracking
-3. Live grade heatmaps
-4. Interactive scenario triggering
-5. Advanced WebSocket integration
+## Next Steps (Phase 5)
+1. Advanced mining scenarios and simulation
+2. ISA-95 integration hub with enterprise systems
+3. Compliance dashboard with standards tracking
+4. Advanced analytics and reporting
+5. Multi-site mining operation support
 
 ## Standards Compliance
 - OPC UA Mining Companion Specification v1.0

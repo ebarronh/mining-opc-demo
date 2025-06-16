@@ -1,5 +1,5 @@
 import { AppLayout } from '@/components/layout/AppLayout'
-import { CheckCircle, Shield, FileText, Award, AlertTriangle } from 'lucide-react'
+import { Shield, FileText, Award, AlertTriangle, CheckCircle } from 'lucide-react'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -10,26 +10,15 @@ export const metadata: Metadata = {
 export default function CompliancePage() {
   return (
     <AppLayout>
-      {/* Hero Section */}
-      <div className="mb-8">
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="p-2 bg-yellow-500/10 rounded-lg">
-            <CheckCircle className="w-6 h-6 text-yellow-400" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold text-white">Compliance Dashboard</h1>
-            <p className="text-slate-400">OPC UA Mining standards compliance and audit tracking</p>
-          </div>
+      {/* Status Banner */}
+      <div className="mb-8 bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
+        <div className="flex items-center space-x-2 mb-2">
+          <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+          <span className="text-yellow-400 font-medium">Coming in Phase 5</span>
         </div>
-        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
-          <div className="flex items-center space-x-2 mb-2">
-            <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-            <span className="text-yellow-400 font-medium">Coming in Phase 5</span>
-          </div>
-          <p className="text-yellow-300 text-sm">
-            Comprehensive standards compliance tracking and regulatory audit capabilities
-          </p>
-        </div>
+        <p className="text-yellow-300 text-sm">
+          Comprehensive standards compliance tracking and regulatory audit capabilities
+        </p>
       </div>
 
       {/* Compliance Overview Grid */}
