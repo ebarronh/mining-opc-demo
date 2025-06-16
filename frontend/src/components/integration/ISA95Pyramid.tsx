@@ -3,6 +3,7 @@
 import React, { useState, useCallback } from 'react';
 import { ISA95Level } from '@/types/integration';
 import { DataFlowAnimator } from './DataFlowAnimator';
+import { DataTransformationExamples } from './DataTransformationExamples';
 import { useDataFlow } from '@/hooks/useDataFlow';
 import { 
   Cpu, 
@@ -308,6 +309,11 @@ export const ISA95Pyramid: React.FC<ISA95PyramidProps> = ({
               </div>
             );
           })}
+        </div>
+
+        {/* Data Transformation Examples */}
+        <div className="mt-12">
+          <DataTransformationExamples selectedLevel={selectedLevel} />
         </div>
 
         {/* Legend */}

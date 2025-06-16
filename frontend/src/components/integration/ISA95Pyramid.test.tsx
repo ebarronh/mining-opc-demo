@@ -4,6 +4,26 @@ import '@testing-library/jest-dom';
 import { ISA95Pyramid } from './ISA95Pyramid';
 import { ISA95Level } from '@/types/integration';
 
+// Mock DataTransformationExamples component
+jest.mock('./DataTransformationExamples', () => ({
+  DataTransformationExamples: () => <div data-testid="data-transformation-examples">DataTransformationExamples</div>
+}));
+
+// Mock DataFlowAnimator component
+jest.mock('./DataFlowAnimator', () => ({
+  DataFlowAnimator: () => <div data-testid="data-flow-animator">DataFlowAnimator</div>
+}));
+
+// Mock useDataFlow hook
+jest.mock('@/hooks/useDataFlow', () => ({
+  useDataFlow: () => ({
+    nodes: [],
+    connections: [],
+    isActive: true,
+    toggleFlow: jest.fn()
+  })
+}));
+
 // Mock Lucide icons
 jest.mock('lucide-react', () => ({
   Cpu: () => <div data-testid="cpu-icon">CPU</div>,
