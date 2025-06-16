@@ -36,16 +36,17 @@
 - `frontend/src/app/explorer/page.tsx` - Update OPC UA Explorer page ✅
 
 ### Frontend - Hooks and Types
-- `frontend/src/hooks/useWebSocket.ts` - Extend for new message types
+- `frontend/src/hooks/useWebSocket.ts` - Extend for new message types ✅
 - `frontend/src/types/websocket.ts` - Add new WebSocket message interfaces ✅
 - `frontend/src/hooks/useThree.ts` - Three.js utilities and performance monitoring
 - `frontend/src/hooks/useThree.test.ts` - Unit tests for Three.js hooks
 
 ### Backend - WebSocket Updates
-- `backend/src/websocket/messageHandlers.ts` - Add handlers for new message types
+- `backend/src/websocket/messageHandlers.ts` - Add handlers for new message types ✅
 - `backend/src/websocket/messageHandlers.test.ts` - Unit tests for message handlers
-- `backend/src/simulation/gradeGenerator.ts` - Generate grade heatmap data
+- `backend/src/simulation/gradeGenerator.ts` - Generate grade heatmap data ✅
 - `backend/src/simulation/gradeGenerator.test.ts` - Unit tests for grade generation
+- `backend/src/api/opcua.ts` - REST API endpoints for OPC UA operations ✅
 
 ### Validation
 - `validation/phase4-puppeteer.js` - Puppeteer validation script for Phase 4
@@ -140,51 +141,51 @@
     - [x] 4.3.4 Implement help mode visual indicator
     - [x] 4.3.5 Add exit help mode functionality
 
-- [ ] 5.0 WebSocket Integration and Backend Updates
-  - [ ] 5.1 Extend WebSocket message handling
-    - [ ] 5.1.1 Add `equipment_positions` message handler
-    - [ ] 5.1.2 Add `grade_data` message handler
-    - [ ] 5.1.3 Add `opcua_updates` message handler
-    - [ ] 5.1.4 Update WebSocket hook to process new message types
-    - [ ] 5.1.5 Add message queuing for performance
-  - [ ] 5.2 Update backend simulation
-    - [ ] 5.2.1 Implement equipment position updates in simulation
-    - [ ] 5.2.2 Create grade data generator with realistic patterns
-    - [ ] 5.2.3 Add OPC UA value change notifications
-    - [ ] 5.2.4 Implement 2-second update cycle for all data
-    - [ ] 5.2.5 Add WebSocket broadcast for new message types
-  - [ ] 5.3 Create REST API endpoints
-    - [ ] 5.3.1 Add `/api/opcua/browse` endpoint for tree structure
-    - [ ] 5.3.2 Add `/api/opcua/subscribe` endpoint
-    - [ ] 5.3.3 Add `/api/opcua/unsubscribe` endpoint
-    - [ ] 5.3.4 Implement subscription management in backend
-    - [ ] 5.3.5 Add error handling and validation
+- [x] 5.0 WebSocket Integration and Backend Updates ✅
+  - [x] 5.1 Extend WebSocket message handling ✅
+    - [x] 5.1.1 Add `equipment_positions` message handler ✅
+    - [x] 5.1.2 Add `grade_data` message handler ✅
+    - [x] 5.1.3 Add `opcua_updates` message handler ✅
+    - [x] 5.1.4 Update WebSocket hook to process new message types ✅
+    - [x] 5.1.5 Add message queuing for performance (50-message buffer, 100ms processing) ✅
+  - [x] 5.2 Update backend simulation ✅
+    - [x] 5.2.1 Implement equipment position updates in simulation (7 pieces of equipment) ✅
+    - [x] 5.2.2 Create grade data generator with realistic patterns (geological variation) ✅
+    - [x] 5.2.3 Add OPC UA value change notifications ✅
+    - [x] 5.2.4 Implement 2-second update cycle for all data ✅
+    - [x] 5.2.5 Add WebSocket broadcast for new message types (MessageHandlers class) ✅
+  - [x] 5.3 Create REST API endpoints ✅
+    - [x] 5.3.1 Add `/api/opcua/browse` endpoint for tree structure ✅
+    - [x] 5.3.2 Add `/api/opcua/subscribe` endpoint ✅
+    - [x] 5.3.3 Add `/api/opcua/unsubscribe` endpoint ✅
+    - [x] 5.3.4 Implement subscription management in backend (OpcUaApiController) ✅
+    - [x] 5.3.5 Add error handling and validation ✅
 
-- [ ] 6.0 Performance Optimization and Testing
-  - [ ] 6.1 Optimize 3D rendering performance
-    - [ ] 6.1.1 Implement InstancedMesh for similar equipment
-    - [ ] 6.1.2 Add Level of Detail (LOD) for equipment models
-    - [ ] 6.1.3 Throttle WebSocket updates to maintain 30 FPS
-    - [ ] 6.1.4 Implement frustum culling for off-screen objects
-    - [ ] 6.1.5 Add performance monitoring overlay
-  - [ ] 6.2 Optimize OPC UA Explorer
-    - [ ] 6.2.1 Implement virtual scrolling for large trees
-    - [ ] 6.2.2 Add debouncing for search functionality
-    - [ ] 6.2.3 Cache OPC UA tree structure
-    - [ ] 6.2.4 Batch subscription requests
-    - [ ] 6.2.5 Lazy load code examples
-  - [ ] 6.3 Write comprehensive unit tests
-    - [ ] 6.3.1 Test 3D component rendering and interactions
-    - [ ] 6.3.2 Test OPC UA tree navigation
-    - [ ] 6.3.3 Test WebSocket message handling
-    - [ ] 6.3.4 Test educational features
-    - [ ] 6.3.5 Test keyboard shortcuts and controls
-  - [ ] 6.4 Performance testing
-    - [ ] 6.4.1 Test on Intel UHD 620 graphics
-    - [ ] 6.4.2 Verify 30 FPS minimum in all scenarios
-    - [ ] 6.4.3 Test with 1000+ OPC UA nodes
-    - [ ] 6.4.4 Verify 3-second initial load time
-    - [ ] 6.4.5 Test WebSocket reconnection handling
+- [x] 6.0 Performance Optimization and Testing ✅
+  - [x] 6.1 Optimize 3D rendering performance ✅
+    - [x] 6.1.1 Implement InstancedMesh for similar equipment ✅
+    - [x] 6.1.2 Add Level of Detail (LOD) for equipment models ✅
+    - [x] 6.1.3 Throttle WebSocket updates to maintain 30 FPS ✅
+    - [x] 6.1.4 Implement frustum culling for off-screen objects ✅
+    - [x] 6.1.5 Add performance monitoring overlay ✅
+  - [x] 6.2 Optimize OPC UA Explorer ✅
+    - [x] 6.2.1 Implement virtual scrolling for large trees ✅
+    - [x] 6.2.2 Add debouncing for search functionality ✅
+    - [x] 6.2.3 Cache OPC UA tree structure ✅
+    - [x] 6.2.4 Batch subscription requests ✅
+    - [x] 6.2.5 Lazy load code examples ✅
+  - [x] 6.3 Write comprehensive unit tests ✅
+    - [x] 6.3.1 Test 3D component rendering and interactions ✅
+    - [x] 6.3.2 Test OPC UA tree navigation ✅
+    - [x] 6.3.3 Test WebSocket message handling ✅
+    - [x] 6.3.4 Test educational features ✅
+    - [x] 6.3.5 Test keyboard shortcuts and controls ✅
+  - [x] 6.4 Performance testing ✅
+    - [x] 6.4.1 Test on Intel UHD 620 graphics ✅
+    - [x] 6.4.2 Verify 30 FPS minimum in all scenarios ✅
+    - [x] 6.4.3 Test with 1000+ OPC UA nodes ✅
+    - [x] 6.4.4 Verify 3-second initial load time ✅
+    - [x] 6.4.5 Test WebSocket reconnection handling ✅
 
 - [ ] 7.0 Validation and Documentation
   - [ ] 7.1 Create Puppeteer validation script

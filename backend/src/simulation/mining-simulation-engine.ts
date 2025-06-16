@@ -62,7 +62,7 @@ export class MiningSimulationEngine {
       payloadGrade: 2.8,
       speed: 25,
       heading: 45,
-      engineTemp: 95,
+      engineTemp: 75, // Normal operating temperature
       loadCycles: 12,
       routeProgress: 0.65
     });
@@ -71,11 +71,11 @@ export class MiningSimulationEngine {
       id: 'TR002', 
       position: { X: 800, Y: 1600, Z: 0 },
       destination: 'WasteDump',
-      payloadWeight: 220,
-      payloadGrade: 1.8,
-      speed: 35,
+      payloadWeight: 0, // Empty truck = idle
+      payloadGrade: 0,
+      speed: 2, // Slow speed = idle
       heading: 180,
-      engineTemp: 88,
+      engineTemp: 65, // Cool temperature 
       loadCycles: 15,
       routeProgress: 0.30
     });
@@ -84,11 +84,11 @@ export class MiningSimulationEngine {
       id: 'TR003',
       position: { X: 1400, Y: 2200, Z: -5 },
       destination: 'Stockpile_A',
-      payloadWeight: 0,
-      payloadGrade: 0,
-      speed: 45,
+      payloadWeight: 150,
+      payloadGrade: 3.1,
+      speed: 35,
       heading: 90,
-      engineTemp: 82,
+      engineTemp: 85, // Normal operating temperature
       loadCycles: 8,
       routeProgress: 0.85
     });
@@ -490,7 +490,7 @@ export class MiningSimulationEngine {
           z: state.position.Z
         },
         rotation: { x: 0, y: state.heading * Math.PI / 180, z: 0 },
-        status: this.getEquipmentStatus(95 - state.engineTemp), // Use temperature as health indicator
+        status: this.getTruckStatus(state), // Calculate truck-specific status
         telemetry: {
           speed: state.speed,
           payload: state.payloadWeight,
@@ -536,6 +536,20 @@ export class MiningSimulationEngine {
   private getEquipmentStatus(healthIndicator: number): 'operating' | 'idle' | 'error' {
     if (healthIndicator < 20) return 'error';
     if (healthIndicator < 50) return 'idle';
+    return 'operating';
+  }
+
+  private getTruckStatus(state: TruckSimulationState): 'operating' | 'idle' | 'error' {
+    // Critical temperature check (above 100°C is error)
+    if (state.engineTemp > 100) return 'error';
+    
+    // Idle conditions
+    if (state.speed < 5 && state.payloadWeight === 0) return 'idle';
+    
+    // High temperature warning (above 95°C but not critical)
+    if (state.engineTemp > 95) return 'idle'; // Caution mode
+    
+    // Normal operating conditions
     return 'operating';
   }
 
