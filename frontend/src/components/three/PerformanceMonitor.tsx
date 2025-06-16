@@ -52,6 +52,18 @@ export function PerformanceMonitor({
   const fpsHistoryRef = useRef<number[]>([]);
   const frameTimeHistoryRef = useRef<number[]>([]);
 
+  // Update culling stats immediately when they change
+  useEffect(() => {
+    if (cullingStats) {
+      setStats(prev => ({
+        ...prev,
+        culledObjects: cullingStats.culledObjects.length,
+        totalObjects: cullingStats.totalObjects,
+        visibilityRatio: cullingStats.visibilityRatio
+      }));
+    }
+  }, [cullingStats]);
+
   useFrame(() => {
     frameCountRef.current++;
     const currentTime = performance.now();

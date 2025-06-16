@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useCallback, useState } from 'react';
-import { useThree, useFrame } from '@react-three/fiber';
+import { useThree as useThreeState, useFrame } from '@react-three/fiber';
 import { Object3D, Vector3, Box3, Sphere } from 'three';
 
 export interface ThreePerformanceMetrics {
@@ -31,7 +31,7 @@ export function useThree(options: UseThreeOptions = {}) {
     targetFPS = 30
   } = options;
 
-  const { scene, camera, gl, size } = useThree();
+  const { scene, camera, gl, size } = useThreeState();
   const [metrics, setMetrics] = useState<ThreePerformanceMetrics | null>(null);
   const frameCountRef = useRef(0);
   const lastTimeRef = useRef(performance.now());

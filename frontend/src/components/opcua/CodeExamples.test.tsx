@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import CodeExamples from './CodeExamples';
 import { OpcUaNode } from '@/types/websocket';
@@ -30,8 +31,14 @@ describe('CodeExamples', () => {
     expect(screen.getByText(/Real-time monitoring dashboards/)).toBeInTheDocument();
   });
 
-  it('should render language options', () => {
+  it('should render language options', async () => {
+    const user = userEvent.setup();
     render(<CodeExamples node={mockNode} />);
+    
+    // Click to expand code examples
+    const expandButton = screen.getByText(/Show.*Code Examples/);
+    await user.click(expandButton);
+    
     expect(screen.getByText('JavaScript')).toBeInTheDocument();
     expect(screen.getByText('Python')).toBeInTheDocument();
     expect(screen.getByText('REST API')).toBeInTheDocument();
