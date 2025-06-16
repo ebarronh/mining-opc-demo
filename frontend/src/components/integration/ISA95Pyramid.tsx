@@ -2,6 +2,8 @@
 
 import React, { useState, useCallback } from 'react';
 import { ISA95Level } from '@/types/integration';
+import { DataFlowAnimator } from './DataFlowAnimator';
+import { useDataFlow } from '@/hooks/useDataFlow';
 import { 
   Cpu, 
   Database, 
@@ -137,6 +139,12 @@ export const ISA95Pyramid: React.FC<ISA95PyramidProps> = ({
 }) => {
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
   const [hoveredLevel, setHoveredLevel] = useState<number | null>(null);
+  
+  // Data flow animation
+  const { nodes, connections, isActive, toggleFlow } = useDataFlow({
+    simulateRealtime: true,
+    updateInterval: 3000
+  });
 
   const handleLevelClick = useCallback((level: ISA95Level) => {
     setSelectedLevel(level.id);
@@ -163,6 +171,23 @@ export const ISA95Pyramid: React.FC<ISA95PyramidProps> = ({
           </div>
         )}
       </div>
+
+      {/* Data Flow Animation */}
+      {showDataFlow && (
+        <div className="mb-8 bg-slate-900 border border-slate-700 rounded-xl p-4 h-64">
+          <DataFlowAnimator
+            nodes={nodes}
+            connections={connections}
+            isActive={isActive && showDataFlow}
+            particleCount={15}
+            animationSpeed={1}
+            className="w-full h-full"
+            onParticleComplete={(particleId, data) => {
+              console.log('Particle completed:', particleId, data);
+            }}
+          />
+        </div>
+      )}
 
       {/* Pyramid Visualization */}
       <div className="relative">
