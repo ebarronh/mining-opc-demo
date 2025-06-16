@@ -22,6 +22,7 @@ export interface UseWebSocketOptions {
   reconnectInterval?: number
   messageQueueSize?: number
   processingInterval?: number
+  targetFPS?: number  // New: Target FPS for updates
   onOpen?: () => void
   onClose?: () => void
   onError?: (error: Event) => void
@@ -65,6 +66,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
     reconnectInterval = 1000,
     messageQueueSize = 50,
     processingInterval = 100,
+    targetFPS = 30,  // Default to 30 FPS
     onOpen,
     onClose,
     onError,
@@ -84,6 +86,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
   const shouldReconnectRef = useRef(true)
   const messageQueueRef = useRef<MessageQueue>({ messages: [], lastProcessed: Date.now() })
   const processingIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const fpsThrottleRef = useRef<{ lastUpdate: number, frameCount: number }>({ lastUpdate: Date.now(), frameCount: 0 })
+  const frameTimeThreshold = 1000 / targetFPS  // Time between frames in ms
 
   const isConnected = state === 'connected'
 
@@ -131,13 +135,19 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
     }
   }, [messageQueueSize])
 
-  // Process queued messages at intervals
+  // Process queued messages at intervals with FPS throttling
   const processMessageQueue = useCallback(() => {
     const queue = messageQueueRef.current
+    const fpsThrottle = fpsThrottleRef.current
     const now = Date.now()
     
-    // Only process if enough time has passed
+    // Only process if enough time has passed (basic interval)
     if (now - queue.lastProcessed < processingInterval) {
+      return
+    }
+    
+    // FPS throttling - check if we should skip this frame to maintain target FPS
+    if (now - fpsThrottle.lastUpdate < frameTimeThreshold) {
       return
     }
     
@@ -146,12 +156,25 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
     queue.messages = []
     queue.lastProcessed = now
     
-    messagesToProcess.forEach(message => {
+    // Update FPS throttle tracking
+    fpsThrottle.frameCount++
+    fpsThrottle.lastUpdate = now
+    
+    // Batch process messages to avoid blocking the main thread
+    const batchSize = Math.min(10, messagesToProcess.length) // Process max 10 messages per frame
+    const messageBatch = messagesToProcess.slice(0, batchSize)
+    
+    // Queue remaining messages back if we couldn't process all
+    if (messagesToProcess.length > batchSize) {
+      queue.messages.unshift(...messagesToProcess.slice(batchSize))
+    }
+    
+    messageBatch.forEach(message => {
       processMessage(message)
       setLastMessage(message)
       addToHistory(message)
     })
-  }, [processingInterval, processMessage, addToHistory])
+  }, [processingInterval, frameTimeThreshold, processMessage, addToHistory])
 
   const connect = useCallback(() => {
     // Check if there's already a global connection

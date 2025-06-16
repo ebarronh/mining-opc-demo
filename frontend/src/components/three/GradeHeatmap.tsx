@@ -5,6 +5,7 @@ import { Mesh, Color, BufferGeometry, Float32BufferAttribute } from 'three';
 import { Text } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import { GradeData } from '@/types/websocket';
+import { getGradeColor } from '@/utils/gradeColors';
 
 interface GradeHeatmapProps {
   data: GradeData | null;
@@ -12,66 +13,9 @@ interface GradeHeatmapProps {
   onCellClick?: (row: number, col: number, grade: number) => void;
 }
 
-// Grade color mapping (low to high) - Enhanced colors for better visibility
-const getGradeColor = (grade: number): Color => {
-  const color = new Color();
-  
-  if (grade < 0.5) {
-    // Deep blue for low grade
-    color.setHSL(0.6, 1, 0.5);
-  } else if (grade < 1.0) {
-    // Cyan for low-medium
-    color.setHSL(0.5, 1, 0.5);
-  } else if (grade < 1.5) {
-    // Green for medium
-    color.setHSL(0.33, 1, 0.5);
-  } else if (grade < 2.0) {
-    // Yellow for medium-high
-    color.setHSL(0.17, 1, 0.5);
-  } else if (grade < 2.5) {
-    // Orange for high
-    color.setHSL(0.08, 1, 0.5);
-  } else {
-    // Red for very high
-    color.setHSL(0, 1, 0.5);
-  }
-  
-  return color;
-};
+// Grade color mapping moved to shared utility
 
-function GradeLegend() {
-  const grades = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0];
-  
-  return (
-    <group position={[260, 20, 0]}>
-      <Text
-        position={[0, 25, 0]}
-        fontSize={3}
-        color="white"
-        anchorX="center"
-      >
-        Grade (%)
-      </Text>
-      
-      {grades.map((grade, i) => (
-        <group key={i} position={[0, 15 - i * 5, 0]}>
-          <mesh>
-            <planeGeometry args={[10, 4]} />
-            <meshBasicMaterial color={getGradeColor(grade)} />
-          </mesh>
-          <Text
-            position={[15, 0, 0]}
-            fontSize={2}
-            color="white"
-            anchorX="left"
-          >
-            {grade.toFixed(1)}%
-          </Text>
-        </group>
-      ))}
-    </group>
-  );
-}
+// GradeLegend function removed - now using UI component
 
 export default function GradeHeatmap({ data, visible, onCellClick }: GradeHeatmapProps) {
   const meshRef = useRef<Mesh>(null);
@@ -212,8 +156,7 @@ export default function GradeHeatmap({ data, visible, onCellClick }: GradeHeatma
         </mesh>
       )}
       
-      {/* Grade legend */}
-      {visible && <GradeLegend />}
+      {/* 3D Grade legend removed - now in UI panel */}
     </group>
   );
 }

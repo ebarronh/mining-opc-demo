@@ -34,19 +34,51 @@ export const miningTerms: Record<string, MiningTerm> = {
   // Measurement Terms
   'grade': {
     term: 'Grade',
-    definition: 'The concentration of valuable minerals or metals in ore. For gold, typically measured in grams per tonne (g/t).',
+    definition: 'The concentration of valuable minerals or metals in ore, representing actual metal content per unit weight. NOT a probability - this is the real percentage of valuable material in the rock.',
     category: 'measurement',
-    relatedTerms: ['ore grade', 'cut-off grade', 'average grade'],
-    example: 'An ore grade of 5.2 g/t Au is considered medium to high grade.',
-    unit: 'g/t (grams per tonne)'
+    relatedTerms: ['ore grade', 'cut-off grade', 'average grade', 'high grade ore', 'mining economics'],
+    example: '2.5% copper grade means 25 kg of copper per tonne of rock. At scale, this generates millions in daily revenue.',
+    unit: '% or g/t (grams per tonne)'
   },
   'cutoff': {
     term: 'Cutoff Grade',
-    definition: 'The minimum ore grade required for economically viable extraction. Varies by mining method and commodity prices.',
+    definition: 'The minimum ore grade required for economically viable extraction. Below this threshold, material is classified as waste but often stockpiled for future processing.',
     category: 'measurement',
-    relatedTerms: ['break-even', 'economic limit', 'marginal ore'],
-    example: 'Open pit mines typically have cutoff grades of 0.5-1.0 g/t Au.',
-    unit: 'g/t'
+    relatedTerms: ['break-even', 'economic limit', 'marginal ore', 'waste', 'stockpile'],
+    example: 'Copper mines typically use 0.2-0.4% cutoff. Gold mines often use 0.3-0.5 g/t cutoff grades.',
+    unit: '% or g/t'
+  },
+  'high grade ore': {
+    term: 'High Grade Ore',
+    definition: 'Ore with metal concentrations significantly above average, representing premium value. Priorities for immediate processing and generates highest profit margins.',
+    category: 'geology',
+    relatedTerms: ['grade', 'premium ore', 'direct shipping ore', 'mill feed'],
+    example: 'High grade copper ore (>2% Cu) or gold ore (>5 g/t Au) commands immediate extraction and processing.',
+    unit: 'Varies by metal'
+  },
+  'mining economics': {
+    term: 'Mining Economics',
+    definition: 'The financial principles governing mining operations. Even seemingly low grades (1-3%) generate massive profits due to the enormous scale of mining operations.',
+    category: 'process',
+    relatedTerms: ['grade', 'throughput', 'economies of scale', 'revenue optimization'],
+    example: 'A mine processing 100,000 tonnes daily at 1% copper grade produces 1,000 tonnes of copper worth ~$8 million per day.',
+    unit: 'Revenue per tonne'
+  },
+  'blending': {
+    term: 'Ore Blending',
+    definition: 'Strategic mixing of different grade ores to optimize mill feed quality and maximize recovery. Balances high and low grade materials for consistent processing.',
+    category: 'process',
+    relatedTerms: ['grade control', 'mill feed', 'optimization', 'stockpile management'],
+    example: 'Blending 60% high-grade (3% Cu) with 40% medium-grade (1% Cu) creates optimal 2.2% mill feed.',
+    unit: 'Grade percentage'
+  },
+  'waste rock': {
+    term: 'Waste Rock',
+    definition: 'Material below cutoff grade that is mined but not immediately processed. Often stockpiled as it may become economically viable if metal prices rise or technology improves.',
+    category: 'process',
+    relatedTerms: ['cutoff grade', 'stockpile', 'future ore', 'dump'],
+    example: 'Copper ore below 0.3% is classified as waste but stockpiled - it could become profitable if copper prices double.',
+    unit: 'Tonnes'
   },
   'payload': {
     term: 'Payload',

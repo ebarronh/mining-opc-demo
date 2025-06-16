@@ -9,6 +9,7 @@ import { Box, Activity, MapPin, Thermometer, BarChart3, Eye, EyeOff, Tag } from 
 import type { EquipmentPosition, GradeData, EquipmentPositionsMessage, GradeDataMessage } from '@/types/websocket';
 import { HelpTarget } from '@/components/educational/HelpTarget';
 import { Tooltip } from '@/components/educational/Tooltip';
+import GradeLegend from '@/components/ui/GradeLegend';
 
 // Dynamically import Three.js components to avoid SSR issues
 const MineScene = nextDynamic(() => import('@/components/three/MineScene'), { 
@@ -170,7 +171,7 @@ export default function RealTimePage() {
   return (
     <AppLayout>
       {/* Header Section */}
-      <div className="mb-6">
+      <div className="mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-blue-500/10 rounded-lg">
@@ -211,12 +212,14 @@ export default function RealTimePage() {
         </div>
       </div>
       
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      {/* Main Content - Flex Layout */}
+      <div className="flex flex-col lg:flex-row gap-4">
         
-        {/* 3D Visualization (3 columns) */}
-        <div className="lg:col-span-3 bg-slate-800 border border-slate-600 rounded-xl p-4">
-          <div className="relative w-full h-[600px] bg-slate-900 rounded-lg overflow-hidden">
+        {/* Left Column - 3D Scene and Bottom Content */}
+        <div className="flex-1 lg:flex-[3] space-y-4">
+          {/* 3D Visualization */}
+          <div className="bg-slate-800 border border-slate-600 rounded-xl p-2">
+            <div className="relative w-full h-[60vh] min-h-[400px] max-h-[600px] bg-slate-900 rounded-lg overflow-hidden">
             <MineScene className="w-full h-full">
               {/* Equipment */}
               {equipmentPositions.map(equipment => (
@@ -251,11 +254,64 @@ export default function RealTimePage() {
               showShortcuts={showShortcuts}
               onToggleShortcuts={toggleHelp}
             />
+            </div>
+          </div>
+          
+          {/* Bottom Content - Immediately below 3D scene */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            
+            {/* Grade Legend */}
+            <div className="lg:col-span-1">
+              <GradeLegend visible={showGradeHeatmap} />
+            </div>
+            
+            {/* OPC UA Updates */}
+            <div className="lg:col-span-1">
+              <div className="bg-slate-800 border border-slate-600 rounded-xl p-4">
+                <h3 className="text-sm font-semibold text-white mb-3">Recent OPC UA Updates</h3>
+                {opcUaUpdates && opcUaUpdates.length > 0 ? (
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {opcUaUpdates.slice(0, 10).map((update, index) => (
+                      <div key={`${update.nodeId}-${index}`} className="p-2 bg-slate-700/50 rounded text-xs">
+                        <div className="text-blue-400 font-mono truncate">{update.nodeId}</div>
+                        <div className="flex justify-between mt-1">
+                          <span className="text-white">{String(update.value)}</span>
+                          <span className="text-slate-400">{update.dataType}</span>
+                        </div>
+                        <div className="text-slate-500 text-[10px]">
+                          {new Date(update.timestamp).toLocaleTimeString()}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-xs text-slate-500">
+                      {connectionState === 'connected' ? 'No recent updates' : 'Connect to see OPC UA updates'}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Controls Instructions */}
+            <div className="lg:col-span-1">
+              <div className="bg-slate-700/50 rounded-lg p-4 text-xs text-slate-400">
+                <p className="font-semibold text-slate-300 mb-2">Controls:</p>
+                <ul className="space-y-1">
+                  <li>• Left click + drag to rotate</li>
+                  <li>• Right click + drag to pan</li>
+                  <li>• Scroll to zoom</li>
+                  <li>• Press H for keyboard shortcuts</li>
+                </ul>
+              </div>
+            </div>
+            
           </div>
         </div>
         
-        {/* Status Panel (1 column) */}
-        <div className="space-y-4">
+        {/* Right Column - Status Panel */}
+        <div className="lg:flex-[1] space-y-4">
           
           {/* WebSocket Status */}
           <div className="bg-slate-800 border border-slate-600 rounded-xl p-4">
@@ -370,37 +426,7 @@ export default function RealTimePage() {
             </div>
           )}
           
-          {/* OPC UA Updates */}
-          {opcUaUpdates && opcUaUpdates.length > 0 && (
-            <div className="bg-slate-800 border border-slate-600 rounded-xl p-4">
-              <h3 className="text-sm font-semibold text-white mb-3">Recent OPC UA Updates</h3>
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {opcUaUpdates.slice(0, 10).map((update, index) => (
-                  <div key={`${update.nodeId}-${index}`} className="p-2 bg-slate-700/50 rounded text-xs">
-                    <div className="text-blue-400 font-mono truncate">{update.nodeId}</div>
-                    <div className="flex justify-between mt-1">
-                      <span className="text-white">{String(update.value)}</span>
-                      <span className="text-slate-400">{update.dataType}</span>
-                    </div>
-                    <div className="text-slate-500 text-[10px]">
-                      {new Date(update.timestamp).toLocaleTimeString()}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Instructions */}
-          <div className="bg-slate-700/50 rounded-lg p-4 text-xs text-slate-400">
-            <p className="font-semibold text-slate-300 mb-2">Controls:</p>
-            <ul className="space-y-1">
-              <li>• Left click + drag to rotate</li>
-              <li>• Right click + drag to pan</li>
-              <li>• Scroll to zoom</li>
-              <li>• Press H for keyboard shortcuts</li>
-            </ul>
-          </div>
+          {/* Content moved to left column */}
         </div>
       </div>
     </AppLayout>

@@ -19,7 +19,8 @@ interface EquipmentProps {
 const STATUS_COLORS = {
   operating: '#00ff00',
   idle: '#ffff00',
-  maintenance: '#ff0000'
+  error: '#ff0000',
+  maintenance: '#ff0000' // Keep for backwards compatibility
 };
 
 function Excavator({ data, showLabel, scenePosition }: { data: EquipmentPosition; showLabel?: boolean; scenePosition: { x: number; y: number; z: number } }) {

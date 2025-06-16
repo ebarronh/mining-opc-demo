@@ -21,7 +21,7 @@ export default function CameraControls({
   
   // Reset camera to default position
   const resetCamera = useCallback(() => {
-    camera.position.set(300, 200, 300); // Match the initial position
+    camera.position.set(200, 150, 200); // Match the initial position
     if (controls) {
       (controls as any).target.set(0, 0, 0);
       (controls as any).update();

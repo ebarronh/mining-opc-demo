@@ -89,7 +89,7 @@ export default function MineScene({ className, children }: MineSceneProps) {
           {/* Camera setup - Better initial view to see whole mine */}
           <PerspectiveCamera
             makeDefault
-            position={[400, 300, 400]} // Further out for better overview of transformed coordinates
+            position={[200, 150, 200]} // Closer view to see equipment better
             fov={60}
             near={0.1}
             far={2000}

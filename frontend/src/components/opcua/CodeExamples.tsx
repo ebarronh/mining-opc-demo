@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo, Suspense, lazy } from 'react';
 import * as Collapsible from '@radix-ui/react-collapsible';
 import { 
   ChevronDown, 
@@ -9,14 +9,22 @@ import {
   Check,
   Code,
   FileCode,
-  Terminal
+  Terminal,
+  Loader2
 } from 'lucide-react';
 import { OpcUaNode } from '@/types/websocket';
+
+// Lazy load the syntax highlighter to improve initial load time
+const SyntaxHighlighter = lazy(() => import('./SyntaxHighlighter'));
 
 interface CodeExamplesProps {
   node: OpcUaNode | null;
   serverUrl?: string;
   className?: string;
+}
+
+interface LazyCodeExamplesProps extends CodeExamplesProps {
+  isExpanded?: boolean;
 }
 
 interface CodeExample {
@@ -202,12 +210,52 @@ function CodeSection({ example, node }: { example: CodeExample; node: OpcUaNode 
       
       <Collapsible.Content>
         <div className="p-3 bg-slate-900 border-t border-slate-800">
-          <pre className="text-xs text-gray-300 overflow-x-auto">
-            <code>{example.code}</code>
-          </pre>
+          <Suspense 
+            fallback={
+              <div className="flex items-center justify-center p-4">
+                <Loader2 className="w-4 h-4 animate-spin text-blue-400 mr-2" />
+                <span className="text-sm text-gray-400">Loading syntax highlighter...</span>
+              </div>
+            }
+          >
+            <SyntaxHighlighter 
+              code={example.code} 
+              language={example.language.toLowerCase()}
+              className="text-xs"
+            />
+          </Suspense>
         </div>
       </Collapsible.Content>
     </Collapsible.Root>
+  );
+}
+
+// Lazy code examples component that only generates examples when expanded
+function LazyCodeExamplesContent({ node, serverUrl, isExpanded }: LazyCodeExamplesProps & { isExpanded: boolean }) {
+  const examples = useMemo(() => {
+    if (!node || !isExpanded) return [];
+    return generateExamples(node, serverUrl || 'opc.tcp://localhost:4840/mining-demo');
+  }, [node, serverUrl, isExpanded]);
+
+  if (!isExpanded) {
+    return (
+      <div className="p-4 text-center text-gray-500">
+        <Code className="w-8 h-8 mx-auto mb-2 opacity-50" />
+        <p className="text-sm">Expand to view code examples</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-4 space-y-2">
+      {examples.map((example, index) => (
+        <CodeSection 
+          key={index} 
+          example={example} 
+          node={node!}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -216,6 +264,8 @@ export default function CodeExamples({
   serverUrl = 'opc.tcp://localhost:4840/mining-demo',
   className = ''
 }: CodeExamplesProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   if (!node) {
     return (
       <div className={`bg-slate-800 border border-slate-600 rounded-lg p-6 ${className}`}>
@@ -226,8 +276,6 @@ export default function CodeExamples({
       </div>
     );
   }
-  
-  const examples = generateExamples(node, serverUrl);
   
   return (
     <div className={`bg-slate-800 border border-slate-600 rounded-lg ${className}`}>
@@ -253,17 +301,36 @@ export default function CodeExamples({
             <li>Custom analytics and machine learning applications</li>
           </ul>
         </div>
+
+        {/* Expand/Collapse button */}
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="mt-3 flex items-center space-x-2 text-sm text-blue-400 hover:text-blue-300 transition-colors"
+        >
+          {isExpanded ? (
+            <ChevronDown className="w-4 h-4" />
+          ) : (
+            <ChevronRight className="w-4 h-4" />
+          )}
+          <span>{isExpanded ? 'Hide' : 'Show'} Code Examples</span>
+        </button>
       </div>
       
-      <div className="p-4 space-y-2">
-        {examples.map((example) => (
-          <CodeSection 
-            key={example.language} 
-            example={example} 
-            node={node}
-          />
-        ))}
-      </div>
+      {/* Lazy loaded content */}
+      <Suspense
+        fallback={
+          <div className="p-4 text-center">
+            <Loader2 className="w-6 h-6 animate-spin text-blue-400 mx-auto mb-2" />
+            <p className="text-sm text-gray-400">Loading code examples...</p>
+          </div>
+        }
+      >
+        <LazyCodeExamplesContent 
+          node={node}
+          serverUrl={serverUrl}
+          isExpanded={isExpanded}
+        />
+      </Suspense>
     </div>
   );
 }
