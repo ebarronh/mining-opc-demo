@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { ISA95Pyramid } from './ISA95Pyramid';
+import ISA95Pyramid from './ISA95Pyramid';
 import { ISA95Level } from '@/types/integration';
 
 // Mock DataTransformationExamples component
@@ -33,6 +33,23 @@ jest.mock('./FollowTheData', () => ({
 jest.mock('./BiDirectionalFlow', () => ({
   BiDirectionalFlow: () => <div data-testid="bi-directional-flow">BiDirectionalFlow</div>
 }));
+
+// Mock SecurityBoundaryHighlight component
+jest.mock('./SecurityBoundaryHighlight', () => ({
+  SecurityBoundaryHighlight: () => <div data-testid="security-boundary-highlight">SecurityBoundaryHighlight</div>
+}));
+
+// Mock DataVolumeMetrics component
+jest.mock('./DataVolumeMetrics', () => ({
+  DataVolumeMetrics: () => <div data-testid="data-volume-metrics">DataVolumeMetrics</div>
+}));
+
+// Mock ISA95LevelTooltip component
+jest.mock('./ISA95LevelTooltip', () => {
+  return function MockISA95LevelTooltip({ children }: { children: React.ReactNode }) {
+    return <div data-testid="isa95-level-tooltip">{children}</div>;
+  };
+});
 
 // Mock useDataFlow hook
 jest.mock('@/hooks/useDataFlow', () => ({

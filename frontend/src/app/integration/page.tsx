@@ -1,5 +1,5 @@
 import { AppLayout } from '@/components/layout/AppLayout'
-import { ISA95Pyramid } from '@/components/integration/ISA95Pyramid'
+import ISA95Pyramid from '@/components/integration/ISA95Pyramid'
 import { Building2, BarChart3, Workflow } from 'lucide-react'
 import type { Metadata } from 'next'
 

@@ -181,7 +181,7 @@ interface ISA95PyramidProps {
   showDataVolumeMetrics?: boolean;
 }
 
-export const ISA95Pyramid: React.FC<ISA95PyramidProps> = ({
+const ISA95Pyramid: React.FC<ISA95PyramidProps> = ({
   className = '',
   onLevelSelect,
   showDataFlow = false,
