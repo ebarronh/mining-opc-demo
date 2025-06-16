@@ -1,4 +1,5 @@
 import { AppLayout } from '@/components/layout/AppLayout'
+import { ISA95Pyramid } from '@/components/integration/ISA95Pyramid'
 import { Building2, BarChart3, Workflow } from 'lucide-react'
 import type { Metadata } from 'next'
 
@@ -11,14 +12,21 @@ export default function IntegrationPage() {
   return (
     <AppLayout>
       {/* Status Banner */}
-      <div className="mb-8 bg-purple-500/10 border border-purple-500/20 rounded-lg p-4">
+      <div className="mb-8 bg-green-500/10 border border-green-500/20 rounded-lg p-4">
         <div className="flex items-center space-x-2 mb-2">
-          <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-          <span className="text-purple-400 font-medium">Coming in Phase 5</span>
+          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+          <span className="text-green-400 font-medium">Phase 5 Active</span>
         </div>
-        <p className="text-purple-300 text-sm">
-          Enterprise integration with ISA-95 flow diagrams and Fleet Management System connectivity
+        <p className="text-green-300 text-sm">
+          Interactive ISA-95 enterprise integration with real-time data flow visualization
         </p>
+      </div>
+
+      {/* ISA-95 Pyramid Visualization */}
+      <div className="mb-8">
+        <ISA95Pyramid 
+          showDataFlow={true}
+        />
       </div>
 
       {/* Feature Preview Grid */}
