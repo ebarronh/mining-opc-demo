@@ -11,6 +11,19 @@
 - `frontend/src/components/integration/LatencyMetrics.test.tsx` - Unit tests for LatencyMetrics component
 - `frontend/src/components/integration/ProtocolTransition.tsx` - Protocol transition visualization (OPC UA → REST → Delta Share)
 - `frontend/src/components/integration/ProtocolTransition.test.tsx` - Unit tests for ProtocolTransition component
+- `frontend/src/components/integration/FollowTheData.tsx` - Interactive data tracing through all ISA-95 levels
+- `frontend/src/components/integration/FollowTheData.test.tsx` - Unit tests for FollowTheData component
+- `frontend/src/components/ui/Tooltip.tsx` - Reusable tooltip component with positioning and animation
+- `frontend/src/components/ui/Tooltip.test.tsx` - Unit tests for Tooltip component
+- `frontend/src/components/integration/ISA95LevelTooltip.tsx` - Specialized tooltip for ISA-95 level explanations
+- `frontend/src/components/integration/ISA95LevelTooltip.test.tsx` - Unit tests for ISA95LevelTooltip component
+- `frontend/src/data/isa95MiningContext.ts` - Comprehensive mining context data for each ISA-95 level
+- `frontend/src/components/integration/SecurityBoundaryHighlight.tsx` - Security boundary highlighting and analysis component
+- `frontend/src/components/integration/SecurityBoundaryHighlight.test.tsx` - Unit tests for SecurityBoundaryHighlight component
+- `frontend/src/components/integration/BiDirectionalFlow.tsx` - Bi-directional data flow animations for control commands
+- `frontend/src/components/integration/BiDirectionalFlow.test.tsx` - Unit tests for BiDirectionalFlow component
+- `frontend/src/components/integration/DataVolumeMetrics.tsx` - Data volume transformation and compression metrics display
+- `frontend/src/components/integration/DataVolumeMetrics.test.tsx` - Unit tests for DataVolumeMetrics component
 - `frontend/src/components/integration/FleetIntegration.tsx` - Fleet management system integration showcase
 - `frontend/src/components/integration/FleetIntegration.test.tsx` - Unit tests for FleetIntegration component
 - `frontend/src/components/integration/OracleConnector.tsx` - Oracle cloud integration demonstration
@@ -46,17 +59,17 @@
 
 ## Tasks
 
-- [ ] 1.0 Create ISA-95 Integration Visualization System
+- [x] 1.0 Create ISA-95 Integration Visualization System
   - [x] 1.1 Design and implement ISA95Pyramid component with interactive levels 0-5
   - [x] 1.2 Create DataFlowAnimator for particle-based data movement visualization
   - [x] 1.3 Implement data transformation examples at each ISA-95 level
   - [x] 1.4 Add latency metrics display (e.g., "20ms sensor → edge")
   - [x] 1.5 Build protocol transition visualization (OPC UA → REST → Delta Share)
-  - [ ] 1.6 Implement "Follow the Data" mode to trace single ore reading through all levels
-  - [ ] 1.7 Add tooltips explaining each ISA-95 level in mining context
-  - [ ] 1.8 Create bi-directional data flow animations for control commands
-  - [ ] 1.9 Implement security boundary highlighting between levels
-  - [ ] 1.10 Add data volume metrics display (e.g., "20 scans/second → 1 aggregate/minute")
+  - [x] 1.6 Implement "Follow the Data" mode to trace single ore reading through all levels
+  - [x] 1.7 Add tooltips explaining each ISA-95 level in mining context
+  - [x] 1.8 Create bi-directional data flow animations for control commands
+  - [x] 1.9 Implement security boundary highlighting between levels
+  - [x] 1.10 Add data volume metrics display (e.g., "20 scans/second → 1 aggregate/minute")
 
 - [ ] 2.0 Implement Fleet Management System Integration Showcase
   - [ ] 2.1 Create FleetIntegration component with vendor selection (Komatsu, Caterpillar, Wenco)

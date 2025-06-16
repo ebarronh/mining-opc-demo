@@ -28,132 +28,196 @@ export default function IntegrationPage() {
           showDataFlow={true}
           showLatencyMetrics={true}
           showProtocolTransition={true}
+          showFollowTheData={true}
+          showBiDirectionalFlow={true}
+          showSecurityBoundaries={true}
+          showDataVolumeMetrics={true}
         />
       </div>
 
-      {/* Feature Preview Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      {/* Integration Components Preview Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
         
-        {/* ISA-95 Flow Diagram */}
+        {/* Task 2.0: Fleet Management System Integration */}
         <div className="bg-slate-800 border border-slate-600 rounded-xl p-6">
-          <div className="flex items-center space-x-3 mb-4">
-            <Workflow className="w-5 h-5 text-blue-400" />
-            <h3 className="text-lg font-semibold text-white">ISA-95 Integration Flow</h3>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <Building2 className="w-5 h-5 text-green-400" />
+              <h3 className="text-lg font-semibold text-white">Fleet Management</h3>
+            </div>
+            <span className="px-2 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded text-xs text-yellow-300">
+              Task 2.0
+            </span>
           </div>
-          <div className="bg-slate-900 border border-slate-700 rounded-lg p-6 mb-4 h-40 flex items-center justify-center">
+          <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 mb-4 h-32 flex items-center justify-center">
             <div className="text-center">
-              <Workflow className="w-12 h-12 text-slate-600 mx-auto mb-2" />
-              <p className="text-slate-500 text-sm">Enterprise Control Integration</p>
+              <Building2 className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+              <p className="text-slate-500 text-xs">FleetIntegration Component</p>
+              <p className="text-slate-600 text-xs mt-1">Coming in Phase 5.2</p>
             </div>
           </div>
-          <ul className="space-y-2 text-sm text-slate-400">
-            <li className="flex items-center space-x-2">
-              <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
-              <span>Level 1-5 hierarchy mapping</span>
-            </li>
-            <li className="flex items-center space-x-2">
-              <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
-              <span>Equipment to enterprise data flow</span>
-            </li>
-            <li className="flex items-center space-x-2">
-              <div className="w-1.5 h-1.5 bg-blue-400 rounded-full"></div>
-              <span>Standards-based integration</span>
-            </li>
+          <ul className="space-y-1 text-xs text-slate-400">
+            <li>• Multi-vendor FMS integration (Komatsu, Caterpillar, Wenco)</li>
+            <li>• Real-time truck re-routing based on ore grade</li>
+            <li>• OEM-agnostic data translation layer</li>
           </ul>
         </div>
 
-        {/* FMS Connectivity */}
+        {/* Task 3.0: Oracle Cloud Integration */}
         <div className="bg-slate-800 border border-slate-600 rounded-xl p-6">
-          <div className="flex items-center space-x-3 mb-4">
-            <Building2 className="w-5 h-5 text-green-400" />
-            <h3 className="text-lg font-semibold text-white">Fleet Management System</h3>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <BarChart3 className="w-5 h-5 text-red-400" />
+              <h3 className="text-lg font-semibold text-white">Oracle Cloud</h3>
+            </div>
+            <span className="px-2 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded text-xs text-yellow-300">
+              Task 3.0
+            </span>
           </div>
-          <div className="space-y-3 mb-4">
-            <div className="p-3 bg-slate-700/50 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-white text-sm font-medium">Caterpillar MineStar</span>
-                <span className="text-green-400 text-xs">Connected</span>
-              </div>
-              <p className="text-slate-400 text-xs">REST API integration</p>
-            </div>
-            <div className="p-3 bg-slate-700/50 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-white text-sm font-medium">Komatsu DISPATCH</span>
-                <span className="text-yellow-400 text-xs">Pending</span>
-              </div>
-              <p className="text-slate-400 text-xs">SOAP web services</p>
-            </div>
-            <div className="p-3 bg-slate-700/50 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-white text-sm font-medium">Hexagon MineOperate</span>
-                <span className="text-blue-400 text-xs">Configured</span>
-              </div>
-              <p className="text-slate-400 text-xs">OPC UA integration</p>
+          <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 mb-4 h-32 flex items-center justify-center">
+            <div className="text-center">
+              <BarChart3 className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+              <p className="text-slate-500 text-xs">OracleConnector Component</p>
+              <p className="text-slate-600 text-xs mt-1">Coming in Phase 5.3</p>
             </div>
           </div>
+          <ul className="space-y-1 text-xs text-slate-400">
+            <li>• Autonomous Database visualization</li>
+            <li>• ORDS API endpoint demonstrations</li>
+            <li>• Oracle APEX low-code examples</li>
+          </ul>
         </div>
 
-        {/* Throughput Metrics */}
-        <div className="bg-slate-800 border border-slate-600 rounded-xl p-6 lg:col-span-2">
-          <div className="flex items-center space-x-3 mb-4">
-            <BarChart3 className="w-5 h-5 text-orange-400" />
-            <h3 className="text-lg font-semibold text-white">Multi-Protocol Performance Metrics</h3>
+        {/* Task 4.0: Delta Share Protocol */}
+        <div className="bg-slate-800 border border-slate-600 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <Workflow className="w-5 h-5 text-purple-400" />
+              <h3 className="text-lg font-semibold text-white">Delta Share</h3>
+            </div>
+            <span className="px-2 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded text-xs text-yellow-300">
+              Task 4.0
+            </span>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 mb-4 h-32 flex items-center justify-center">
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-400 mb-1">30+</div>
-              <div className="text-sm text-slate-400">Messages/second</div>
-              <div className="text-xs text-green-400 mt-1">REST API</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-400 mb-1">15+</div>
-              <div className="text-sm text-slate-400">SOAP calls/second</div>
-              <div className="text-xs text-blue-400 mt-1">Web Services</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-400 mb-1">45+</div>
-              <div className="text-sm text-slate-400">OPC UA subscriptions</div>
-              <div className="text-xs text-purple-400 mt-1">Real-time data</div>
+              <Workflow className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+              <p className="text-slate-500 text-xs">DeltaShareExplorer Component</p>
+              <p className="text-slate-600 text-xs mt-1">Coming in Phase 5.4</p>
             </div>
           </div>
+          <ul className="space-y-1 text-xs text-slate-400">
+            <li>• Cross-platform data sharing (Python, Spark, Tableau)</li>
+            <li>• Zero data movement architecture</li>
+            <li>• Row/column level security</li>
+          </ul>
+        </div>
+
+        {/* Task 5.0: ERP Integration & Edge Computing */}
+        <div className="bg-slate-800 border border-slate-600 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <Building2 className="w-5 h-5 text-blue-400" />
+              <h3 className="text-lg font-semibold text-white">ERP & Edge</h3>
+            </div>
+            <span className="px-2 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded text-xs text-yellow-300">
+              Task 5.0
+            </span>
+          </div>
+          <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 mb-4 h-32 flex items-center justify-center">
+            <div className="text-center">
+              <Building2 className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+              <p className="text-slate-500 text-xs">ERPIntegration & EdgeComputing</p>
+              <p className="text-slate-600 text-xs mt-1">Coming in Phase 5.5</p>
+            </div>
+          </div>
+          <ul className="space-y-1 text-xs text-slate-400">
+            <li>• Multi-ERP connectors (SAP, Oracle, Dynamics)</li>
+            <li>• Edge computing resilience scenarios</li>
+            <li>• Environmental challenge simulations</li>
+          </ul>
+        </div>
+
+        {/* Task 6.0: Analytics Dashboard & API Playground */}
+        <div className="bg-slate-800 border border-slate-600 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <BarChart3 className="w-5 h-5 text-orange-400" />
+              <h3 className="text-lg font-semibold text-white">Analytics & APIs</h3>
+            </div>
+            <span className="px-2 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded text-xs text-yellow-300">
+              Task 6.0
+            </span>
+          </div>
+          <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 mb-4 h-32 flex items-center justify-center">
+            <div className="text-center">
+              <BarChart3 className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+              <p className="text-slate-500 text-xs">AnalyticsDashboard & APIPlayground</p>
+              <p className="text-slate-600 text-xs mt-1">Coming in Phase 5.6</p>
+            </div>
+          </div>
+          <ul className="space-y-1 text-xs text-slate-400">
+            <li>• Predictive analytics with XGBoost models</li>
+            <li>• Interactive API endpoint testing</li>
+            <li>• Real-time KPI displays</li>
+          </ul>
+        </div>
+
+        {/* Task 7.0: Educational Features */}
+        <div className="bg-slate-800 border border-slate-600 rounded-xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <Workflow className="w-5 h-5 text-cyan-400" />
+              <h3 className="text-lg font-semibold text-white">Education</h3>
+            </div>
+            <span className="px-2 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded text-xs text-yellow-300">
+              Task 7.0
+            </span>
+          </div>
+          <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 mb-4 h-32 flex items-center justify-center">
+            <div className="text-center">
+              <Workflow className="w-8 h-8 text-slate-600 mx-auto mb-2" />
+              <p className="text-slate-500 text-xs">Educational Components</p>
+              <p className="text-slate-600 text-xs mt-1">Coming in Phase 5.7</p>
+            </div>
+          </div>
+          <ul className="space-y-1 text-xs text-slate-400">
+            <li>• Integration pattern library</li>
+            <li>• Interactive troubleshooting guide</li>
+            <li>• Architecture decision records</li>
+          </ul>
         </div>
       </div>
 
-      {/* Technical Specifications */}
-      <div className="bg-slate-800 border border-slate-600 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">Integration Standards</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div>
-            <h4 className="text-sm font-medium text-slate-300 mb-2">Enterprise Standards</h4>
-            <ul className="space-y-1 text-sm text-slate-400">
-              <li>• ISA-95 Levels 1-5</li>
-              <li>• Enterprise Resource Planning</li>
-              <li>• Manufacturing Execution</li>
-            </ul>
+      {/* Task 1.0 Completion Summary */}
+      <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-6">
+        <div className="flex items-center space-x-3 mb-4">
+          <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+          <h3 className="text-lg font-semibold text-white">Task 1.0: ISA-95 Integration System - COMPLETED</h3>
+          <span className="px-2 py-1 bg-green-500/20 border border-green-500/30 rounded text-xs text-green-300">
+            ✅ Phase 5.1
+          </span>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+          <div className="text-center">
+            <div className="text-green-400 font-bold">1.1-1.10</div>
+            <div className="text-slate-400 text-xs">All Sub-tasks</div>
           </div>
-          <div>
-            <h4 className="text-sm font-medium text-slate-300 mb-2">Communication Protocols</h4>
-            <ul className="space-y-1 text-sm text-slate-400">
-              <li>• OPC UA client/server</li>
-              <li>• REST API interfaces</li>
-              <li>• SOAP web services</li>
-            </ul>
+          <div className="text-center">
+            <div className="text-green-400 font-bold">6 Levels</div>
+            <div className="text-slate-400 text-xs">ISA-95 Hierarchy</div>
           </div>
-          <div>
-            <h4 className="text-sm font-medium text-slate-300 mb-2">Fleet Management</h4>
-            <ul className="space-y-1 text-sm text-slate-400">
-              <li>• Caterpillar MineStar</li>
-              <li>• Komatsu DISPATCH</li>
-              <li>• Hexagon MineOperate</li>
-            </ul>
+          <div className="text-center">
+            <div className="text-green-400 font-bold">50+ Tests</div>
+            <div className="text-slate-400 text-xs">Comprehensive Coverage</div>
           </div>
-          <div>
-            <h4 className="text-sm font-medium text-slate-300 mb-2">Performance</h4>
-            <ul className="space-y-1 text-sm text-slate-400">
-              <li>• &lt;2s data latency</li>
-              <li>• 30+ msg/sec throughput</li>
-              <li>• Enterprise scalability</li>
-            </ul>
+          <div className="text-center">
+            <div className="text-green-400 font-bold">Live Data</div>
+            <div className="text-slate-400 text-xs">Real-time Animation</div>
+          </div>
+          <div className="text-center">
+            <div className="text-green-400 font-bold">Executive</div>
+            <div className="text-slate-400 text-xs">Ready Presentation</div>
           </div>
         </div>
       </div>

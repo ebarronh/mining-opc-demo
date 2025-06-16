@@ -6,6 +6,11 @@ import { DataFlowAnimator } from './DataFlowAnimator';
 import { DataTransformationExamples } from './DataTransformationExamples';
 import { LatencyMetrics } from './LatencyMetrics';
 import { ProtocolTransition } from './ProtocolTransition';
+import { FollowTheData } from './FollowTheData';
+import ISA95LevelTooltip from './ISA95LevelTooltip';
+import { BiDirectionalFlow } from './BiDirectionalFlow';
+import { SecurityBoundaryHighlight } from './SecurityBoundaryHighlight';
+import { DataVolumeMetrics } from './DataVolumeMetrics';
 import { useDataFlow } from '@/hooks/useDataFlow';
 import { 
   Cpu, 
@@ -17,7 +22,8 @@ import {
   Clock,
   HardDrive,
   Zap,
-  ArrowUpDown
+  ArrowUpDown,
+  Info
 } from 'lucide-react';
 
 // ISA-95 levels with mining-specific context
@@ -169,6 +175,10 @@ interface ISA95PyramidProps {
   followDataMode?: boolean;
   showLatencyMetrics?: boolean;
   showProtocolTransition?: boolean;
+  showFollowTheData?: boolean;
+  showBiDirectionalFlow?: boolean;
+  showSecurityBoundaries?: boolean;
+  showDataVolumeMetrics?: boolean;
 }
 
 export const ISA95Pyramid: React.FC<ISA95PyramidProps> = ({
@@ -177,7 +187,11 @@ export const ISA95Pyramid: React.FC<ISA95PyramidProps> = ({
   showDataFlow = false,
   followDataMode = false,
   showLatencyMetrics = false,
-  showProtocolTransition = false
+  showProtocolTransition = false,
+  showFollowTheData = false,
+  showBiDirectionalFlow = false,
+  showSecurityBoundaries = false,
+  showDataVolumeMetrics = false
 }) => {
   const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
   const [hoveredLevel, setHoveredLevel] = useState<number | null>(null);
@@ -298,9 +312,14 @@ export const ISA95Pyramid: React.FC<ISA95PyramidProps> = ({
                         {getLevelIcon(level.id)}
                       </div>
                       <div>
-                        <h3 className="font-semibold text-sm md:text-base">
-                          Level {level.id}: {level.name}
-                        </h3>
+                        <ISA95LevelTooltip level={level.id} placement="right">
+                          <div className="flex items-center space-x-1 cursor-help">
+                            <h3 className="font-semibold text-sm md:text-base border-b border-dotted border-transparent hover:border-blue-400 transition-colors">
+                              Level {level.id}: {level.name}
+                            </h3>
+                            <Info className="w-3 h-3 text-blue-400 opacity-60 hover:opacity-100 transition-opacity" />
+                          </div>
+                        </ISA95LevelTooltip>
                         <p className="text-xs opacity-90 hidden md:block">
                           {level.description}
                         </p>
@@ -360,14 +379,14 @@ export const ISA95Pyramid: React.FC<ISA95PyramidProps> = ({
 
         {/* Data Transformation Examples */}
         <div className="mt-12">
-          <DataTransformationExamples selectedLevel={selectedLevel} />
+          <DataTransformationExamples selectedLevel={selectedLevel ?? undefined} />
         </div>
 
         {/* Latency Metrics */}
         {showLatencyMetrics && (
           <div className="mt-12">
             <LatencyMetrics 
-              selectedLevel={selectedLevel}
+              selectedLevel={selectedLevel ?? undefined}
               showRealTime={showDataFlow}
             />
           </div>
@@ -379,6 +398,55 @@ export const ISA95Pyramid: React.FC<ISA95PyramidProps> = ({
             <ProtocolTransition 
               animateFlow={showDataFlow && isActive}
               showDetails={true}
+            />
+          </div>
+        )}
+
+        {/* Follow the Data */}
+        {showFollowTheData && (
+          <div className="mt-12">
+            <FollowTheData 
+              selectedLevel={selectedLevel ?? undefined}
+              autoStart={followDataMode}
+              onDataFlowComplete={() => {
+                console.log('Data flow tracing complete');
+              }}
+            />
+          </div>
+        )}
+
+        {/* Bi-Directional Flow */}
+        {showBiDirectionalFlow && (
+          <div className="mt-12">
+            <BiDirectionalFlow 
+              autoStart={followDataMode}
+              onFlowComplete={(scenarioId) => {
+                console.log('Bi-directional flow complete:', scenarioId);
+              }}
+            />
+          </div>
+        )}
+
+        {/* Security Boundary Highlighting */}
+        {showSecurityBoundaries && (
+          <div className="mt-12">
+            <SecurityBoundaryHighlight 
+              selectedLevel={selectedLevel ?? undefined}
+              showDetails={true}
+              onBoundarySelect={(boundary) => {
+                console.log('Security boundary selected:', boundary);
+              }}
+            />
+          </div>
+        )}
+
+        {/* Data Volume Metrics */}
+        {showDataVolumeMetrics && (
+          <div className="mt-12">
+            <DataVolumeMetrics 
+              selectedLevel={selectedLevel ?? undefined}
+              showRealTimeFlow={true}
+              animated={showDataFlow}
             />
           </div>
         )}

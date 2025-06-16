@@ -24,6 +24,16 @@ jest.mock('./ProtocolTransition', () => ({
   ProtocolTransition: () => <div data-testid="protocol-transition">ProtocolTransition</div>
 }));
 
+// Mock FollowTheData component
+jest.mock('./FollowTheData', () => ({
+  FollowTheData: () => <div data-testid="follow-the-data">FollowTheData</div>
+}));
+
+// Mock BiDirectionalFlow component
+jest.mock('./BiDirectionalFlow', () => ({
+  BiDirectionalFlow: () => <div data-testid="bi-directional-flow">BiDirectionalFlow</div>
+}));
+
 // Mock useDataFlow hook
 jest.mock('@/hooks/useDataFlow', () => ({
   useDataFlow: () => ({
@@ -267,5 +277,68 @@ describe('ISA95Pyramid', () => {
     
     // Should render ProtocolTransition
     expect(screen.getByTestId('protocol-transition')).toBeInTheDocument();
+  });
+
+  it('shows follow the data when showFollowTheData is true', () => {
+    render(<ISA95Pyramid showFollowTheData={true} />);
+    
+    // Should render the FollowTheData component
+    expect(screen.getByTestId('follow-the-data')).toBeInTheDocument();
+  });
+
+  it('hides follow the data when showFollowTheData is false', () => {
+    render(<ISA95Pyramid showFollowTheData={false} />);
+    
+    // Should not render the FollowTheData component
+    expect(screen.queryByTestId('follow-the-data')).not.toBeInTheDocument();
+  });
+
+  it('passes correct props to FollowTheData component', () => {
+    const mockOnLevelSelect = jest.fn();
+    render(
+      <ISA95Pyramid 
+        showFollowTheData={true}
+        followDataMode={true}
+        onLevelSelect={mockOnLevelSelect}
+      />
+    );
+    
+    // Should render FollowTheData
+    expect(screen.getByTestId('follow-the-data')).toBeInTheDocument();
+    
+    // Click on a level to select it
+    const level0Element = screen.getByText(/Level 0: Field Level/).closest('div');
+    if (level0Element) {
+      fireEvent.click(level0Element);
+      
+      // FollowTheData should receive the selectedLevel
+      expect(screen.getByTestId('follow-the-data')).toBeInTheDocument();
+    }
+  });
+
+  it('shows bi-directional flow when showBiDirectionalFlow is true', () => {
+    render(<ISA95Pyramid showBiDirectionalFlow={true} />);
+    
+    // Should render the BiDirectionalFlow component
+    expect(screen.getByTestId('bi-directional-flow')).toBeInTheDocument();
+  });
+
+  it('hides bi-directional flow when showBiDirectionalFlow is false', () => {
+    render(<ISA95Pyramid showBiDirectionalFlow={false} />);
+    
+    // Should not render the BiDirectionalFlow component
+    expect(screen.queryByTestId('bi-directional-flow')).not.toBeInTheDocument();
+  });
+
+  it('passes correct props to BiDirectionalFlow component', () => {
+    render(
+      <ISA95Pyramid 
+        showBiDirectionalFlow={true}
+        followDataMode={true}
+      />
+    );
+    
+    // Should render BiDirectionalFlow
+    expect(screen.getByTestId('bi-directional-flow')).toBeInTheDocument();
   });
 });
