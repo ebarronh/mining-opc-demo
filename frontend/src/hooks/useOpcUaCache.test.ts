@@ -1,6 +1,11 @@
 import { renderHook, act } from '@testing-library/react';
 import { useOpcUaCache, OpcUaNode } from './useOpcUaCache';
 
+// Polyfill for structuredClone if not available in Jest environment
+if (typeof structuredClone === 'undefined') {
+  global.structuredClone = (val: any) => JSON.parse(JSON.stringify(val));
+}
+
 // Mock localStorage
 const localStorageMock = {
   getItem: jest.fn(),
@@ -97,7 +102,9 @@ describe('useOpcUaCache', () => {
     });
 
     // Try to get expired entry (should remove it)
-    result.current.get('test-node');
+    act(() => {
+      result.current.get('test-node');
+    });
     
     expect(result.current.cacheSize).toBe(0);
   });
@@ -315,6 +322,9 @@ describe('useOpcUaCache', () => {
   });
 
   test('handles localStorage errors gracefully', () => {
+    // Suppress console.warn for this test
+    const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+    
     localStorageMock.getItem.mockImplementation(() => {
       throw new Error('Storage error');
     });
@@ -327,5 +337,7 @@ describe('useOpcUaCache', () => {
         })
       );
     }).not.toThrow();
+    
+    consoleSpy.mockRestore();
   });
 });
