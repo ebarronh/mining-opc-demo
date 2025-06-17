@@ -9,7 +9,7 @@ Executive-ready, standards-based real-time ore intelligence platform showcasing 
 - ✅ WebSocket client foundation for Phase 4
 - ✅ Enhanced placeholder pages with executive-ready polish
 - ✅ Dark theme with mining-specific visual identity
-- ✅ Puppeteer validation script
+- ✅ Playwright MCP validation script
 
 ## Phase 4: 3D Visualization & OPC UA Explorer (COMPLETED)
 - ✅ Three.js 3D mine scene with equipment visualization
@@ -21,7 +21,7 @@ Executive-ready, standards-based real-time ore intelligence platform showcasing 
 - ✅ Educational features: glossary, tooltips, and help mode
 - ✅ Performance optimizations: LOD, frustum culling, instancing
 - ✅ Comprehensive test suite with pre-commit hooks
-- ✅ Puppeteer validation script for Phase 4
+- ✅ Playwright MCP validation script for Phase 4
 
 ## Development Commands
 
@@ -108,20 +108,18 @@ pnpm --filter backend test:watch
 
 ### Phase 3 Validation
 ```bash
-# Run Phase 3 Puppeteer validation (requires frontend running)
-pnpm validate:phase3
-
-# Take screenshot and validate Phase 3 requirements
-# Output: validation/phase3-shell.png
+# Run Phase 3 Playwright MCP validation (requires frontend running)
+# Use Playwright MCP tools to validate Phase 3 requirements
+# Take screenshots and validate shell functionality
+# Output: screenshots and validation results via Playwright MCP
 ```
 
 ### Phase 4 Validation
 ```bash
-# Run Phase 4 Puppeteer validation (requires both frontend and backend running)
-node validation/phase4-puppeteer.js
-
-# Validates 3D scene, equipment, heatmap, OPC UA explorer
-# Output: validation/phase4-realtime.png, phase4-explorer.png, phase4-complete.png
+# Run Phase 4 Playwright MCP validation (requires both frontend and backend running)
+# Use Playwright MCP tools to validate 3D scene, equipment, heatmap, OPC UA explorer
+# Navigate to pages, take screenshots, and verify functionality
+# Output: screenshots and validation results via Playwright MCP browser tools
 ```
 
 ## Architecture
@@ -245,7 +243,7 @@ pnpm dev
 ### 3. Validation
 ```bash
 # Run Phase 4 validation (requires both servers running)
-node validation/phase4-puppeteer.js
+# Use Playwright MCP browser tools for validation
 
 # Ensure all tests pass
 pnpm test
@@ -359,10 +357,11 @@ pnpm dev:frontend
 - Check browser console for connection errors
 - Verify CORS settings if needed
 
-**Puppeteer validation failures:**
-- Ensure frontend server is running and accessible
-- Check port 3000 is not blocked
-- Run with headless: false for debugging
+**Playwright MCP validation issues:**
+- Ensure frontend and backend servers are running and accessible
+- Check ports 3000 and 3001 are not blocked
+- Use Playwright MCP browser tools to navigate and verify functionality
+- Take screenshots to document validation results
 
 ## Next Steps (Phase 5)
 1. Advanced mining scenarios and simulation

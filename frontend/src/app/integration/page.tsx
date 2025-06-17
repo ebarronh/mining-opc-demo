@@ -1,5 +1,6 @@
 import { AppLayout } from '@/components/layout/AppLayout'
 import ISA95Pyramid from '@/components/integration/ISA95Pyramid'
+import FleetIntegration from '@/components/integration/FleetIntegration'
 import { Building2, BarChart3, Workflow } from 'lucide-react'
 import type { Metadata } from 'next'
 
@@ -38,29 +39,9 @@ export default function IntegrationPage() {
       {/* Integration Components Preview Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
         
-        {/* Task 2.0: Fleet Management System Integration */}
-        <div className="bg-slate-800 border border-slate-600 rounded-xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-3">
-              <Building2 className="w-5 h-5 text-green-400" />
-              <h3 className="text-lg font-semibold text-white">Fleet Management</h3>
-            </div>
-            <span className="px-2 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded text-xs text-yellow-300">
-              Task 2.0
-            </span>
-          </div>
-          <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 mb-4 h-32 flex items-center justify-center">
-            <div className="text-center">
-              <Building2 className="w-8 h-8 text-slate-600 mx-auto mb-2" />
-              <p className="text-slate-500 text-xs">FleetIntegration Component</p>
-              <p className="text-slate-600 text-xs mt-1">Coming in Phase 5.2</p>
-            </div>
-          </div>
-          <ul className="space-y-1 text-xs text-slate-400">
-            <li>• Multi-vendor FMS integration (Komatsu, Caterpillar, Wenco)</li>
-            <li>• Real-time truck re-routing based on ore grade</li>
-            <li>• OEM-agnostic data translation layer</li>
-          </ul>
+        {/* Task 2.0: Fleet Management System Integration - ACTIVE */}
+        <div className="lg:col-span-2 xl:col-span-3">
+          <FleetIntegration />
         </div>
 
         {/* Task 3.0: Oracle Cloud Integration */}

@@ -42,7 +42,17 @@
 - `frontend/src/hooks/useIntegrationSimulator.ts` - Hook for simulating integration scenarios
 - `frontend/src/types/integration.ts` - TypeScript types for integration components
 - `frontend/src/data/integrationPatterns.ts` - Static data for integration patterns and examples
-- `frontend/src/data/fleetManagementSystems.ts` - Configuration data for different FMS vendors
+- `frontend/src/data/fleetManagementSystems.ts` - Configuration data for different FMS vendors (CREATED)
+- `frontend/src/components/integration/FleetIntegration.tsx` - Main fleet management integration component with vendor selection (CREATED)
+- `frontend/src/components/integration/FleetIntegration.test.tsx` - Unit tests for FleetIntegration component (CREATED)
+- `frontend/src/components/integration/TruckReroutingVisualization.tsx` - Real-time truck re-routing visualization with canvas-based mine map (CREATED)
+- `frontend/src/components/integration/TruckReroutingVisualization.test.tsx` - Unit tests for TruckReroutingVisualization component (CREATED)
+- `frontend/src/components/integration/APICallDisplay.tsx` - Interactive API call display with vendor-specific request/response formats (CREATED)
+- `frontend/src/components/integration/APICallDisplay.test.tsx` - Unit tests for APICallDisplay component (CREATED)
+- `frontend/src/components/integration/PerformanceMetricsDashboard.tsx` - Comprehensive performance metrics dashboard with ROI analysis (CREATED)
+- `frontend/src/components/integration/PerformanceMetricsDashboard.test.tsx` - Unit tests for PerformanceMetricsDashboard component (CREATED)
+- `frontend/src/components/integration/DataTranslationLayer.tsx` - OEM-agnostic data translation layer with field mapping visualization (CREATED)
+- `frontend/src/components/integration/DataTranslationLayer.test.tsx` - Unit tests for DataTranslationLayer component (CREATED)
 - `frontend/src/utils/dataTransformers.ts` - Utility functions for data transformation examples
 - `backend/src/routes/integration.ts` - Backend API routes for integration endpoints
 - `backend/src/routes/integration.test.ts` - Unit tests for integration API routes
@@ -57,6 +67,16 @@
 - Unit tests should typically be placed alongside the code files they are testing (e.g., `MyComponent.tsx` and `MyComponent.test.tsx` in the same directory).
 - Use `npx jest [optional/path/to/test/file]` to run tests. Running without a path executes all tests found by the Jest configuration.
 
+### Validation Requirements
+
+- **All completed tasks must be validated using Playwright MCP browser tools**
+- Use `mcp__playwright__browser_navigate` to navigate to relevant pages
+- Use `mcp__playwright__browser_take_screenshot` to capture validation evidence
+- Use `mcp__playwright__browser_click` and other interaction tools to test functionality
+- Take screenshots of key features and save them for documentation
+- Validate that all components render correctly and interactions work as expected
+- **Replacement for Puppeteer**: All previous Puppeteer validation scripts should now use Playwright MCP tools instead
+
 ## Tasks
 
 - [x] 1.0 Create ISA-95 Integration Visualization System
@@ -70,18 +90,22 @@
   - [x] 1.8 Create bi-directional data flow animations for control commands
   - [x] 1.9 Implement security boundary highlighting between levels
   - [x] 1.10 Add data volume metrics display (e.g., "20 scans/second → 1 aggregate/minute")
+  
+  **Validation (Playwright MCP)**: Navigate to `/integration`, verify ISA-95 pyramid displays all 6 levels, test interactive tooltips, confirm data flow animations, validate security boundary highlighting, and verify data volume metrics visualization. Take screenshots of: complete integration hub page, ISA-95 pyramid with tooltips, security boundaries, and data volume metrics.
 
 - [ ] 2.0 Implement Fleet Management System Integration Showcase
-  - [ ] 2.1 Create FleetIntegration component with vendor selection (Komatsu, Caterpillar, Wenco)
-  - [ ] 2.2 Build real-time truck re-routing visualization based on ore grade
-  - [ ] 2.3 Implement API call display showing data formats for each FMS
-  - [ ] 2.4 Create performance metrics dashboard (5.9% diversion rates, $3-50M savings)
-  - [ ] 2.5 Build OEM-agnostic data translation layer demonstration
+  - [x] 2.1 Create FleetIntegration component with vendor selection (Komatsu, Caterpillar, Wenco)
+  - [x] 2.2 Build real-time truck re-routing visualization based on ore grade
+  - [x] 2.3 Implement API call display showing data formats for each FMS
+  - [x] 2.4 Create performance metrics dashboard (5.9% diversion rates, $3-50M savings)
+  - [x] 2.5 Build OEM-agnostic data translation layer demonstration
   - [ ] 2.6 Implement integration configuration UI for adding new FMS
   - [ ] 2.7 Create real-time equipment status synchronization display
   - [ ] 2.8 Add material classification confidence score visualization
   - [ ] 2.9 Implement shift change data handoff demonstration
   - [ ] 2.10 Create FMS vendor comparison matrix component
+  
+  **Validation (Playwright MCP)**: Navigate to fleet management section, test vendor selection (Komatsu, Caterpillar, Wenco), verify truck re-routing visualization, validate API call displays, test performance metrics dashboard, and confirm configuration UI functionality. Screenshots required for each major component.
 
 - [ ] 3.0 Build Oracle Cloud Integration Demonstration
   - [ ] 3.1 Create OracleConnector component with Autonomous Database visualization
@@ -94,6 +118,8 @@
   - [ ] 3.8 Implement role-based access control demonstration
   - [ ] 3.9 Create data retention and archival policy visualization
   - [ ] 3.10 Build Oracle integration troubleshooting guide component
+  
+  **Validation (Playwright MCP)**: Navigate to Oracle Cloud section, test Autonomous Database visualization, verify ORDS API demonstrations, validate APEX low-code examples, test OCI Functions visualization, and confirm Analytics Cloud dashboard mockups. Screenshots of database connections, API responses, and dashboard examples.
 
 - [ ] 4.0 Develop Delta Share Protocol Implementation
   - [ ] 4.1 Create DeltaShareExplorer component with provider/recipient setup
@@ -106,6 +132,8 @@
   - [ ] 4.8 Create share expiration management interface
   - [ ] 4.9 Implement cost savings calculator for reduced egress
   - [ ] 4.10 Build recipient onboarding workflow component
+  
+  **Validation (Playwright MCP)**: Navigate to Delta Share section, test provider/recipient setup, verify dataset browser functionality, validate cross-platform access examples, test data governance dashboard, and confirm security configuration UI. Screenshots of data sharing workflows and governance features.
 
 - [ ] 5.0 Create ERP Integration Scenarios and Edge Computing Demo
   - [ ] 5.1 Build ERPIntegration component with maintenance scheduling workflow
@@ -118,6 +146,8 @@
   - [ ] 5.8 Implement environmental challenge visualizations (dust, vibration, temperature)
   - [ ] 5.9 Create failover pattern demonstrations with <5 second recovery
   - [ ] 5.10 Build edge analytics dashboard with ML inference examples
+  
+  **Validation (Playwright MCP)**: Navigate to ERP and Edge Computing sections, test maintenance scheduling workflows, verify ore inventory management, validate cost allocation workflows, test multi-ERP connectors, verify edge computing architecture, and confirm resilience scenarios. Screenshots of ERP integrations and edge computing demonstrations.
 
 - [ ] 6.0 Build Analytics Dashboard and API Playground
   - [ ] 6.1 Create AnalyticsDashboard with predictive analytics (XGBoost model)
@@ -130,6 +160,8 @@
   - [ ] 6.8 Implement error handling examples with retry strategies
   - [ ] 6.9 Build SDK code examples for multiple languages
   - [ ] 6.10 Create API performance benchmarks and rate limiting display
+  
+  **Validation (Playwright MCP)**: Navigate to Analytics and API sections, test predictive analytics dashboard, verify contamination reduction analysis, validate equipment optimization insights, test real-time KPI displays, verify API playground functionality, and confirm performance benchmarks. Screenshots of analytics dashboards and API testing interfaces.
 
 - [ ] 7.0 Implement Educational Features and Integration Patterns
   - [ ] 7.1 Create IntegrationPatterns library with visual examples
@@ -142,3 +174,5 @@
   - [ ] 7.8 Build compliance mapping visualizations
   - [ ] 7.9 Implement cost optimization tips component
   - [ ] 7.10 Create learning progress tracker with localStorage persistence
+  
+  **Validation (Playwright MCP)**: Navigate to Educational sections, test integration patterns library, verify transformation pipeline visualization, validate troubleshooting guide interactivity, test architecture decision records, verify monitoring best practices, and confirm learning progress tracking. Screenshots of educational components and user progress.
