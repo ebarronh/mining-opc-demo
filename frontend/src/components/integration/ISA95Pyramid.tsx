@@ -306,72 +306,62 @@ const ISA95Pyramid: React.FC<ISA95PyramidProps> = ({
                     </div>
                   )}
 
-                  {/* Use responsive layout to prevent text overlap */}
-                  <div className={`text-white ${actualLevel <= 1 ? 'space-y-2' : 'flex items-center justify-between'}`}>
-                    <div className="flex items-center space-x-3">
+                  {/* Fixed layout - no responsive changes */}
+                  <div className="text-white relative">
+                    <div className="flex items-center justify-center space-x-2">
                       <div className="flex-shrink-0">
                         {getLevelIcon(level.id)}
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <ISA95LevelTooltip level={level.id} placement="right">
-                          <div className="flex items-center space-x-1 cursor-help">
-                            <h3 className="font-semibold text-sm md:text-base border-b border-dotted border-transparent hover:border-blue-400 transition-colors truncate">
-                              Level {level.id}: {level.name}
-                            </h3>
-                            <Info className="w-3 h-3 text-blue-400 opacity-60 hover:opacity-100 transition-opacity flex-shrink-0" />
+                      <div className="min-w-0 flex-1 text-center">
+                        <div className="group relative">
+                          <h3 className="font-semibold text-sm border-b border-dotted border-transparent hover:border-blue-400 transition-colors cursor-help">
+                            Level {level.id}: {level.name}
+                          </h3>
+                          
+                          {/* Floating tooltip - doesn't affect layout */}
+                          <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 w-80 p-4 bg-slate-900 border border-slate-600 rounded-lg text-xs text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none shadow-xl">
+                            <div className="font-medium text-white mb-2">Level {level.id}: {level.name}</div>
+                            <p className="mb-3 text-slate-300">{level.description}</p>
+                            
+                            <div className="grid grid-cols-2 gap-3 mb-3">
+                              <div>
+                                <div className="font-medium text-white mb-1">Metrics</div>
+                                <div className="space-y-1">
+                                  <div className="flex items-center space-x-1">
+                                    <Clock className="w-3 h-3 text-blue-400" />
+                                    <span>{level.latency}</span>
+                                  </div>
+                                  <div className="flex items-center space-x-1">
+                                    <Database className="w-3 h-3 text-green-400" />
+                                    <span>{level.dataVolume}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div>
+                                <div className="font-medium text-white mb-1">Mining Context</div>
+                                <p className="text-xs text-slate-400">{level.miningContext}</p>
+                              </div>
+                            </div>
+                            
+                            <div className="border-t border-slate-700 pt-2">
+                              <div className="font-medium text-white mb-1">Protocols</div>
+                              <div className="flex flex-wrap gap-1">
+                                {level.protocols.slice(0, 3).map(protocol => (
+                                  <span key={protocol} className="px-2 py-1 bg-slate-800 rounded text-xs">{protocol}</span>
+                                ))}
+                              </div>
+                            </div>
                           </div>
-                        </ISA95LevelTooltip>
-                        <p className="text-xs opacity-90 hidden md:block">
-                          {level.description}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    {/* Metrics - Stack vertically for narrow levels */}
-                    <div className={`text-xs opacity-75 ${actualLevel <= 1 ? 'flex flex-wrap gap-x-4 gap-y-1 justify-center mt-1' : 'text-right hidden lg:block'}`}>
-                      <div className="flex items-center space-x-1">
-                        <Clock className="w-3 h-3" />
-                        <span>{level.latency}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Database className="w-3 h-3" />
-                        <span>{level.dataVolume}</span>
-                      </div>
-                      {showLatencyMetrics && level.transitionLatencies?.toNext && (
-                        <div className="flex items-center space-x-1">
-                          <ArrowUpDown className="w-3 h-3 text-blue-400" />
-                          <span className="text-blue-300">{level.transitionLatencies.toNext}</span>
                         </div>
-                      )}
+                        
+                        {/* Single key metric - always visible */}
+                        <div className="text-xs text-slate-300 mt-1">
+                          {level.latency}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Mining Context - shown on hover or selection */}
-                  {(isHovered || isSelected) && (
-                    <div className="mt-3 pt-3 border-t border-white/20">
-                      <p className="text-xs text-white/90 mb-2">
-                        <strong>Mining Context:</strong> {level.miningContext}
-                      </p>
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                          <strong className="text-white/90">Protocols:</strong>
-                          <ul className="text-white/75 mt-1">
-                            {level.protocols.slice(0, 2).map(protocol => (
-                              <li key={protocol}>• {protocol}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div>
-                          <strong className="text-white/90">Data Types:</strong>
-                          <ul className="text-white/75 mt-1">
-                            {level.dataTypes.slice(0, 2).map(dataType => (
-                              <li key={dataType}>• {dataType}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             );

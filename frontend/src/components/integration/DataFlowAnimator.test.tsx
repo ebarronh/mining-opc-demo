@@ -123,7 +123,7 @@ describe('DataFlowAnimator', () => {
     expect(screen.getByText(/particles/)).toBeInTheDocument();
   });
 
-  it('shows data flow metrics', () => {
+  it('shows data flow metrics and journey label', () => {
     render(
       <DataFlowAnimator
         nodes={sampleNodes}
@@ -133,6 +133,8 @@ describe('DataFlowAnimator', () => {
     
     expect(screen.getByText('Data Packets')).toBeInTheDocument();
     expect(screen.getByText('Readings/sec')).toBeInTheDocument();
+    expect(screen.getByText('ISA-95 Data Journey')).toBeInTheDocument();
+    expect(screen.getByText('Watch ore readings flow through mining systems')).toBeInTheDocument();
   });
 
   it('creates canvas with correct dimensions', () => {

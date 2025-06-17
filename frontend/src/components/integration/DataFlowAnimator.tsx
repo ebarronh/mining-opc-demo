@@ -31,22 +31,20 @@ interface AnimatedParticle {
 }
 
 const getParticleColor = (connectionId: string, progress: number) => {
-  // Color based on data type and progress
-  const colors = {
-    sensor: '#ef4444', // red
-    control: '#f97316', // orange  
-    scada: '#eab308', // yellow
-    mes: '#22c55e', // green
-    erp: '#3b82f6', // blue
-    bi: '#8b5cf6' // purple
-  };
+  // Map progress to ISA-95 levels (0-5)
+  const level = Math.floor(progress * 6);
   
-  // Animate color transition based on progress
-  const baseColor = colors.sensor;
-  const targetColor = colors.bi;
+  // Colors representing each ISA-95 level
+  const levelColors = [
+    '#ef4444', // Level 0: Red - Field sensors
+    '#f97316', // Level 1: Orange - Control systems  
+    '#eab308', // Level 2: Yellow - SCADA
+    '#22c55e', // Level 3: Green - MES
+    '#3b82f6', // Level 4: Blue - ERP
+    '#8b5cf6'  // Level 5: Purple - Business Intelligence
+  ];
   
-  // Simple color interpolation
-  return progress < 0.5 ? baseColor : targetColor;
+  return levelColors[Math.min(level, 5)];
 };
 
 const getConnectionPath = (from: DataFlowNode, to: DataFlowNode) => {
@@ -346,6 +344,12 @@ export const DataFlowAnimator: React.FC<DataFlowAnimatorProps> = ({
 
   return (
     <div className={`relative w-full h-full overflow-hidden ${className}`}>
+      {/* Canvas Label */}
+      <div className="absolute top-4 left-4 bg-slate-800/80 backdrop-blur rounded-lg px-3 py-2 z-10">
+        <div className="text-xs font-medium text-white mb-1">ISA-95 Data Journey</div>
+        <div className="text-xs text-slate-400">Watch ore readings flow through mining systems</div>
+      </div>
+
       <canvas
         ref={canvasRef}
         width={dimensions.width}
@@ -372,18 +376,26 @@ export const DataFlowAnimator: React.FC<DataFlowAnimatorProps> = ({
           <div className="w-1 h-1 bg-blue-400 rounded-full animate-pulse"></div>
           <div className="group relative">
             <Info className="w-3 h-3 text-slate-400 hover:text-blue-400 cursor-help" />
-            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 w-64 p-3 bg-slate-900 border border-slate-600 rounded-lg text-xs text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none">
-              <div className="font-medium text-white mb-1">Data Flow Animation</div>
-              <p className="mb-2">Each particle represents sensor data flowing through ISA-95 levels:</p>
-              <ul className="space-y-1 text-xs">
-                <li><span className="text-red-400">Red:</span> Raw sensor data (Level 0)</li>
-                <li><span className="text-orange-400">Orange:</span> Control signals (Level 1)</li>
-                <li><span className="text-yellow-400">Yellow:</span> SCADA data (Level 2)</li>
-                <li><span className="text-green-400">Green:</span> Production data (Level 3)</li>
-                <li><span className="text-blue-400">Blue:</span> Business data (Level 4)</li>
-                <li><span className="text-purple-400">Purple:</span> Analytics insights (Level 5)</li>
-              </ul>
-              <p className="mt-2 text-slate-400">Watch how data gets progressively aggregated and enriched!</p>
+            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 w-80 p-3 bg-slate-900 border border-slate-600 rounded-lg text-xs text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none">
+              <div className="font-medium text-white mb-1">ISA-95 Data Flow Simulation</div>
+              <p className="mb-2">This animation shows how ore sensor data travels through mining systems. Each particle represents a data reading that:</p>
+              <div className="mb-2 p-2 bg-slate-800 rounded">
+                <p className="text-xs">• <strong>Starts RED</strong> as raw sensor reading from XRF analyzer</p>
+                <p className="text-xs">• <strong>Changes color</strong> as it gets processed through each ISA-95 level</p>
+                <p className="text-xs">• <strong>Ends PURPLE</strong> as strategic business insight</p>
+              </div>
+              <div className="text-xs mb-2">
+                <div className="font-medium text-white mb-1">Color = Processing Level:</div>
+                <div className="grid grid-cols-2 gap-1">
+                  <div><span className="text-red-400">●</span> Field sensors</div>
+                  <div><span className="text-orange-400">●</span> Control systems</div>
+                  <div><span className="text-yellow-400">●</span> SCADA displays</div>
+                  <div><span className="text-green-400">●</span> Production planning</div>
+                  <div><span className="text-blue-400">●</span> Business systems</div>
+                  <div><span className="text-purple-400">●</span> Executive analytics</div>
+                </div>
+              </div>
+              <p className="text-slate-400 text-xs">Watch a single ore reading become strategic intelligence!</p>
             </div>
           </div>
         </div>

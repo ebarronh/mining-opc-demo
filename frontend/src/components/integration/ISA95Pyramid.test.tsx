@@ -83,13 +83,13 @@ describe('ISA95Pyramid', () => {
     // Check that the main title is rendered
     expect(screen.getByText('ISA-95 Integration Pyramid')).toBeInTheDocument();
     
-    // Check that all 6 levels are rendered (0-5)
-    expect(screen.getByText(/Level 0: Field Level/)).toBeInTheDocument();
-    expect(screen.getByText(/Level 1: Control Level/)).toBeInTheDocument();
-    expect(screen.getByText(/Level 2: Supervision Level/)).toBeInTheDocument();
-    expect(screen.getByText(/Level 3: MES Level/)).toBeInTheDocument();
-    expect(screen.getByText(/Level 4: ERP Level/)).toBeInTheDocument();
-    expect(screen.getByText(/Level 5: Business Intelligence/)).toBeInTheDocument();
+    // Check that all 6 levels are rendered (0-5) - using getAllBy since tooltips duplicate text
+    expect(screen.getAllByText(/Level 0: Field Level/)).toHaveLength(2); // Main + tooltip
+    expect(screen.getAllByText(/Level 1: Control Level/)).toHaveLength(2);
+    expect(screen.getAllByText(/Level 2: Supervision Level/)).toHaveLength(2);
+    expect(screen.getAllByText(/Level 3: MES Level/)).toHaveLength(2);
+    expect(screen.getAllByText(/Level 4: ERP Level/)).toHaveLength(2);
+    expect(screen.getAllByText(/Level 5: Business Intelligence/)).toHaveLength(2);
   });
 
   it('displays security boundary indicators for appropriate levels', () => {
@@ -131,8 +131,9 @@ describe('ISA95Pyramid', () => {
     const mockOnLevelSelect = jest.fn();
     render(<ISA95Pyramid onLevelSelect={mockOnLevelSelect} />);
     
-    // Click on Level 0 (Field Level)
-    const level0Element = screen.getByText(/Level 0: Field Level/).closest('div');
+    // Click on Level 0 (Field Level) - get the first instance (main heading, not tooltip)
+    const level0Elements = screen.getAllByText(/Level 0: Field Level/);
+    const level0Element = level0Elements[0].closest('div');
     expect(level0Element).toBeInTheDocument();
     
     if (level0Element) {
@@ -150,25 +151,22 @@ describe('ISA95Pyramid', () => {
     }
   });
 
-  it('shows additional details on hover', async () => {
+  it('shows tooltips on hover', async () => {
     render(<ISA95Pyramid />);
     
-    const level0Element = screen.getByText(/Level 0: Field Level/).closest('div');
+    // Get the first Level 0 element (main heading, not tooltip)
+    const level0Elements = screen.getAllByText(/Level 0: Field Level/);
+    const level0Element = level0Elements[0].closest('.group');
     expect(level0Element).toBeInTheDocument();
     
     if (level0Element) {
-      // Hover over the element
+      // Hover over the element should show tooltip content via CSS (opacity)
       fireEvent.mouseEnter(level0Element);
       
-      await waitFor(() => {
-        // Should show mining context
-        expect(screen.getByText(/Mining Context:/)).toBeInTheDocument();
-        expect(screen.getByText(/Protocols:/)).toBeInTheDocument();
-        expect(screen.getByText(/Data Types:/)).toBeInTheDocument();
-      });
-      
-      // Mouse leave should hide details
-      fireEvent.mouseLeave(level0Element);
+      // The tooltip content should be in the DOM (even if hidden by CSS)
+      expect(screen.getByText(/Mining Context/)).toBeInTheDocument();
+      expect(screen.getByText(/Protocols/)).toBeInTheDocument();
+      expect(screen.getByText(/Metrics/)).toBeInTheDocument();
     }
   });
 
@@ -215,15 +213,8 @@ describe('ISA95Pyramid', () => {
   it('shows mining-specific context for each level', async () => {
     render(<ISA95Pyramid />);
     
-    // Hover over Level 0 to see mining context
-    const level0Element = screen.getByText(/Level 0: Field Level/).closest('div');
-    if (level0Element) {
-      fireEvent.mouseEnter(level0Element);
-      
-      await waitFor(() => {
-        expect(screen.getByText(/Ore analyzers, conveyors, excavators/)).toBeInTheDocument();
-      });
-    }
+    // Mining context should be in tooltips (in DOM even if hidden)
+    expect(screen.getByText(/Ore analyzers, conveyors, excavators/)).toBeInTheDocument();
   });
 
   it('shows latency metrics when showLatencyMetrics is true', () => {
@@ -261,8 +252,9 @@ describe('ISA95Pyramid', () => {
     // Should render LatencyMetrics with showRealTime=true when showDataFlow=true
     expect(screen.getByTestId('latency-metrics')).toBeInTheDocument();
     
-    // Click on a level to select it
-    const level0Element = screen.getByText(/Level 0: Field Level/).closest('div');
+    // Click on a level to select it - get first instance (main heading)
+    const level0Elements = screen.getAllByText(/Level 0: Field Level/);
+    const level0Element = level0Elements[0].closest('div');
     if (level0Element) {
       fireEvent.click(level0Element);
       
@@ -324,8 +316,9 @@ describe('ISA95Pyramid', () => {
     // Should render FollowTheData
     expect(screen.getByTestId('follow-the-data')).toBeInTheDocument();
     
-    // Click on a level to select it
-    const level0Element = screen.getByText(/Level 0: Field Level/).closest('div');
+    // Click on a level to select it - get first instance (main heading)
+    const level0Elements = screen.getAllByText(/Level 0: Field Level/);
+    const level0Element = level0Elements[0].closest('div');
     if (level0Element) {
       fireEvent.click(level0Element);
       
