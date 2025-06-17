@@ -306,18 +306,19 @@ const ISA95Pyramid: React.FC<ISA95PyramidProps> = ({
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between text-white">
+                  {/* Use responsive layout to prevent text overlap */}
+                  <div className={`text-white ${actualLevel <= 1 ? 'space-y-2' : 'flex items-center justify-between'}`}>
                     <div className="flex items-center space-x-3">
                       <div className="flex-shrink-0">
                         {getLevelIcon(level.id)}
                       </div>
-                      <div>
+                      <div className="min-w-0 flex-1">
                         <ISA95LevelTooltip level={level.id} placement="right">
                           <div className="flex items-center space-x-1 cursor-help">
-                            <h3 className="font-semibold text-sm md:text-base border-b border-dotted border-transparent hover:border-blue-400 transition-colors">
+                            <h3 className="font-semibold text-sm md:text-base border-b border-dotted border-transparent hover:border-blue-400 transition-colors truncate">
                               Level {level.id}: {level.name}
                             </h3>
-                            <Info className="w-3 h-3 text-blue-400 opacity-60 hover:opacity-100 transition-opacity" />
+                            <Info className="w-3 h-3 text-blue-400 opacity-60 hover:opacity-100 transition-opacity flex-shrink-0" />
                           </div>
                         </ISA95LevelTooltip>
                         <p className="text-xs opacity-90 hidden md:block">
@@ -326,9 +327,9 @@ const ISA95Pyramid: React.FC<ISA95PyramidProps> = ({
                       </div>
                     </div>
                     
-                    {/* Metrics */}
-                    <div className="text-right text-xs opacity-75 hidden lg:block">
-                      <div className="flex items-center space-x-1 mb-1">
+                    {/* Metrics - Stack vertically for narrow levels */}
+                    <div className={`text-xs opacity-75 ${actualLevel <= 1 ? 'flex flex-wrap gap-x-4 gap-y-1 justify-center mt-1' : 'text-right hidden lg:block'}`}>
+                      <div className="flex items-center space-x-1">
                         <Clock className="w-3 h-3" />
                         <span>{level.latency}</span>
                       </div>
@@ -337,7 +338,7 @@ const ISA95Pyramid: React.FC<ISA95PyramidProps> = ({
                         <span>{level.dataVolume}</span>
                       </div>
                       {showLatencyMetrics && level.transitionLatencies?.toNext && (
-                        <div className="flex items-center space-x-1 mt-1">
+                        <div className="flex items-center space-x-1">
                           <ArrowUpDown className="w-3 h-3 text-blue-400" />
                           <span className="text-blue-300">{level.transitionLatencies.toNext}</span>
                         </div>

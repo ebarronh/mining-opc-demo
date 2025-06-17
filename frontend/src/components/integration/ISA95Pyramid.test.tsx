@@ -73,6 +73,7 @@ jest.mock('lucide-react', () => ({
   HardDrive: () => <div data-testid="harddrive-icon">HardDrive</div>,
   Zap: () => <div data-testid="zap-icon">Zap</div>,
   ArrowUpDown: () => <div data-testid="arrow-icon">Arrow</div>,
+  Info: () => <div data-testid="info-icon">Info</div>,
 }));
 
 describe('ISA95Pyramid', () => {

@@ -123,7 +123,7 @@ describe('DataFlowAnimator', () => {
     expect(screen.getByText(/particles/)).toBeInTheDocument();
   });
 
-  it('shows throughput metrics', () => {
+  it('shows data flow metrics', () => {
     render(
       <DataFlowAnimator
         nodes={sampleNodes}
@@ -131,9 +131,8 @@ describe('DataFlowAnimator', () => {
       />
     );
     
-    expect(screen.getByText('Throughput')).toBeInTheDocument();
-    expect(screen.getByText('Active')).toBeInTheDocument();
-    expect(screen.getByText('Avg Value')).toBeInTheDocument();
+    expect(screen.getByText('Data Packets')).toBeInTheDocument();
+    expect(screen.getByText('Readings/sec')).toBeInTheDocument();
   });
 
   it('creates canvas with correct dimensions', () => {

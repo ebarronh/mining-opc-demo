@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Info } from 'lucide-react';
 import { DataFlowNode, DataFlowConnection, DataFlowParticle } from '@/types/integration';
 
 interface DataFlowAnimatorProps {
@@ -364,19 +365,40 @@ export const DataFlowAnimator: React.FC<DataFlowAnimatorProps> = ({
         </span>
       </div>
 
-      {/* Throughput metrics */}
-      <div className="absolute bottom-4 left-4 bg-slate-800/80 backdrop-blur rounded-lg p-3">
-        <div className="text-xs text-slate-400 mb-1">Throughput</div>
+      {/* Data Flow Metrics */}
+      <div className="absolute bottom-4 left-4 bg-slate-800/80 backdrop-blur rounded-lg p-3 max-w-xs">
+        <div className="flex items-center space-x-2 mb-2">
+          <div className="text-xs font-medium text-white">Real-time Data Flow</div>
+          <div className="w-1 h-1 bg-blue-400 rounded-full animate-pulse"></div>
+          <div className="group relative">
+            <Info className="w-3 h-3 text-slate-400 hover:text-blue-400 cursor-help" />
+            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 w-64 p-3 bg-slate-900 border border-slate-600 rounded-lg text-xs text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none">
+              <div className="font-medium text-white mb-1">Data Flow Animation</div>
+              <p className="mb-2">Each particle represents sensor data flowing through ISA-95 levels:</p>
+              <ul className="space-y-1 text-xs">
+                <li><span className="text-red-400">Red:</span> Raw sensor data (Level 0)</li>
+                <li><span className="text-orange-400">Orange:</span> Control signals (Level 1)</li>
+                <li><span className="text-yellow-400">Yellow:</span> SCADA data (Level 2)</li>
+                <li><span className="text-green-400">Green:</span> Production data (Level 3)</li>
+                <li><span className="text-blue-400">Blue:</span> Business data (Level 4)</li>
+                <li><span className="text-purple-400">Purple:</span> Analytics insights (Level 5)</li>
+              </ul>
+              <p className="mt-2 text-slate-400">Watch how data gets progressively aggregated and enriched!</p>
+            </div>
+          </div>
+        </div>
         <div className="grid grid-cols-2 gap-3 text-xs">
           <div>
-            <div className="text-green-400 font-mono">{particles.length}</div>
-            <div className="text-slate-400">Active</div>
+            <div className="text-green-400 font-mono text-sm">{particles.length}</div>
+            <div className="text-slate-400">Data Packets</div>
+            <div className="text-slate-500 text-xs">in transit</div>
           </div>
           <div>
-            <div className="text-blue-400 font-mono">
-              {(particles.reduce((sum, p) => sum + p.data.value, 0) / particles.length || 0).toFixed(1)}
+            <div className="text-blue-400 font-mono text-sm">
+              {(particles.reduce((sum, p) => sum + (p.data?.value || 45), 0) / particles.length || 45).toFixed(0)}
             </div>
-            <div className="text-slate-400">Avg Value</div>
+            <div className="text-slate-400">Readings/sec</div>
+            <div className="text-slate-500 text-xs">avg rate</div>
           </div>
         </div>
       </div>
