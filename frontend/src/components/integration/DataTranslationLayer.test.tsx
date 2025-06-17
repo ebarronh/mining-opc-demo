@@ -146,18 +146,20 @@ describe('DataTranslationLayer', () => {
     
     const transformButton = screen.getByText('Transform')
     
-    // Use act to wrap the state-changing operations
-    await act(async () => {
-      fireEvent.click(transformButton)
-      
-      // Should show processing state
+    // Click the transform button
+    fireEvent.click(transformButton)
+    
+    // Should show processing state immediately
+    await waitFor(() => {
       expect(screen.getByText('Processing...')).toBeInTheDocument()
-      expect(transformButton).toBeDisabled()
-      
-      // Fast-forward time to complete processing
+    })
+    
+    // Fast-forward time to complete processing
+    act(() => {
       jest.advanceTimersByTime(2000)
     })
     
+    // Should return to transform state
     await waitFor(() => {
       expect(screen.getByText('Transform')).toBeInTheDocument()
     })

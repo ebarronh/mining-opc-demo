@@ -344,10 +344,9 @@ export const DataFlowAnimator: React.FC<DataFlowAnimatorProps> = ({
 
   return (
     <div className={`relative w-full h-full overflow-hidden ${className}`}>
-      {/* Canvas Label */}
-      <div className="absolute top-4 left-4 bg-slate-800/80 backdrop-blur rounded-lg px-3 py-2 z-10">
-        <div className="text-xs font-medium text-white mb-1">From Ore Sample to Business Decision</div>
-        <div className="text-xs text-slate-400">Watch how one ore reading becomes strategic intelligence</div>
+      {/* Canvas Label - moved to top center to be less intrusive */}
+      <div className="absolute top-2 left-1/2 transform -translate-x-1/2 bg-slate-800/90 backdrop-blur rounded-lg px-3 py-1 z-10 text-center">
+        <div className="text-xs font-medium text-white">From Ore Sample to Business Decision</div>
       </div>
 
       <canvas
@@ -358,122 +357,92 @@ export const DataFlowAnimator: React.FC<DataFlowAnimatorProps> = ({
         style={{ imageRendering: 'pixelated' }}
       />
       
-      {/* Animation controls */}
-      <div className="absolute top-4 right-4 flex items-center space-x-2 bg-slate-800/80 backdrop-blur rounded-lg px-3 py-2">
+      {/* Animation controls - moved to top right corner */}
+      <div className="absolute top-2 right-2 flex items-center space-x-2 bg-slate-800/90 backdrop-blur rounded-lg px-2 py-1">
         <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-green-400 animate-pulse' : 'bg-gray-400'}`} />
         <span className="text-xs text-white">
-          {isActive ? 'Data Flow Active' : 'Data Flow Paused'}
-        </span>
-        <span className="text-xs text-slate-400">
           {particles.length} samples
         </span>
       </div>
 
-      {/* Simple Legend */}
-      <div className="absolute bottom-4 right-4 bg-slate-800/80 backdrop-blur rounded-lg p-3 text-xs">
-        <div className="text-white font-medium mb-2">Legend</div>
+      {/* Simple Legend - moved to bottom left, made smaller */}
+      <div className="absolute bottom-2 left-2 bg-slate-800/90 backdrop-blur rounded-lg p-2 text-xs">
+        <div className="text-white font-medium mb-1 text-xs">Quick Guide</div>
         <div className="space-y-1">
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-            <span className="text-slate-300">Mining Systems</span>
+          <div className="flex items-center space-x-1">
+            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+            <span className="text-slate-300 text-xs">Systems</span>
           </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-red-400 rounded-full"></div>
-            <span className="text-slate-300">Ore Sample Data</span>
+          <div className="flex items-center space-x-1">
+            <div className="w-1.5 h-1.5 bg-red-400 rounded-full"></div>
+            <span className="text-slate-300 text-xs">Data</span>
           </div>
         </div>
-        <div className="text-slate-400 text-xs mt-2">
-          Follow a dot from red to purple!
+        <div className="text-slate-400 text-xs mt-1">
+          Follow red→purple
         </div>
       </div>
 
-      {/* Data Flow Metrics */}
-      <div className="absolute bottom-4 left-4 bg-slate-800/80 backdrop-blur rounded-lg p-3 max-w-xs">
-        <div className="flex items-center space-x-2 mb-2">
-          <div className="text-xs font-medium text-white">Real-time Data Flow</div>
-          <div className="w-1 h-1 bg-blue-400 rounded-full animate-pulse"></div>
-          <div className="group relative">
-            <Info className="w-3 h-3 text-slate-400 hover:text-blue-400 cursor-help" />
-            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 w-96 p-4 bg-slate-900 border border-slate-600 rounded-lg text-xs text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none shadow-2xl">
-              <div className="font-medium text-white mb-2">How Mining Data Becomes Business Intelligence</div>
-              
-              <div className="mb-3 p-3 bg-blue-500/10 border border-blue-500/30 rounded">
-                <div className="font-medium text-blue-300 mb-1">What You're Watching:</div>
-                <p className="text-xs text-blue-200">Each moving dot represents one ore sample reading (like "62.5% iron content") traveling through your mining operation's computer systems.</p>
-              </div>
-
-              <div className="mb-3">
-                <div className="font-medium text-white mb-2">The Journey (Follow One Dot):</div>
-                <div className="space-y-2">
-                  <div className="flex items-start space-x-2">
-                    <span className="text-red-400 text-lg">●</span>
-                    <div>
-                      <div className="font-medium text-red-300">Start: Ore Analyzer</div>
-                      <div className="text-xs text-slate-400">"Sample #1247: 62.5% Fe, 8.2% SiO2"</div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start space-x-2">
-                    <span className="text-orange-400 text-lg">●</span>
-                    <div>
-                      <div className="font-medium text-orange-300">Control System</div>
-                      <div className="text-xs text-slate-400">"High grade detected - route to premium stockpile"</div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start space-x-2">
-                    <span className="text-yellow-400 text-lg">●</span>
-                    <div>
-                      <div className="font-medium text-yellow-300">Operator Screen</div>
-                      <div className="text-xs text-slate-400">"Premium pile: +142 tons today"</div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start space-x-2">
-                    <span className="text-green-400 text-lg">●</span>
-                    <div>
-                      <div className="font-medium text-green-300">Production Report</div>
-                      <div className="text-xs text-slate-400">"Daily average: 61.8% Fe (+2% vs target)"</div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start space-x-2">
-                    <span className="text-blue-400 text-lg">●</span>
-                    <div>
-                      <div className="font-medium text-blue-300">Business System</div>
-                      <div className="text-xs text-slate-400">"Order premium rail cars for shipment"</div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start space-x-2">
-                    <span className="text-purple-400 text-lg">●</span>
-                    <div>
-                      <div className="font-medium text-purple-300">Executive Dashboard</div>
-                      <div className="text-xs text-slate-400">"Premium ore margins up 8% this quarter"</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="border-t border-slate-700 pt-2">
-                <div className="font-medium text-white mb-1">Big Circles = Computer Systems</div>
-                <p className="text-xs text-slate-400">Each large circle represents a different computer system in your mine (analyzers, controllers, displays, databases, etc.)</p>
-              </div>
-            </div>
-          </div>
+      {/* Help Info - positioned in bottom right with full detailed tooltip */}
+      <div className="absolute bottom-2 right-2 group">
+        <div className="bg-slate-800/90 backdrop-blur rounded-full p-2 cursor-help">
+          <Info className="w-4 h-4 text-slate-400 hover:text-blue-400 transition-colors" />
         </div>
-        <div className="grid grid-cols-2 gap-3 text-xs">
-          <div>
-            <div className="text-green-400 font-mono text-sm">{particles.length}</div>
-            <div className="text-slate-400">Ore Samples</div>
-            <div className="text-slate-500 text-xs">being processed</div>
+        <div className="fixed bottom-12 right-0 w-96 p-4 bg-slate-900 border border-slate-600 rounded-lg text-sm text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity z-[100] pointer-events-none shadow-2xl">
+          <div className="font-medium text-white mb-3 text-lg">Mining Data Flow Guide</div>
+          
+          <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded">
+            <div className="font-medium text-blue-300 mb-2">What You're Watching:</div>
+            <p className="text-sm text-blue-200">Moving dots represent ore sample readings traveling through different levels of mining information systems, demonstrating the ISA-95 data pyramid in action.</p>
           </div>
-          <div>
-            <div className="text-blue-400 font-mono text-sm">
-              {(particles.reduce((sum, p) => sum + (p.data?.value || 45), 0) / particles.length || 45).toFixed(0)}
+
+          <div className="mb-4">
+            <div className="font-medium text-white mb-2">Complete Data Journey:</div>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                <span>Level 0: Ore Analyzer (XRF readings, GPS data)</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                <span>Level 1: Control Systems (PLCs, safety interlocks)</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                <span>Level 2: SCADA (HMI displays, trend data)</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span>Level 3: Production (MES, quality control)</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <span>Level 4: Business (ERP, financial systems)</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                <span>Level 5: Executive (BI, strategic planning)</span>
+              </div>
             </div>
-            <div className="text-slate-400">Samples/sec</div>
-            <div className="text-slate-500 text-xs">from analyzers</div>
+          </div>
+
+          <div className="mb-4 border-t border-slate-700 pt-3">
+            <div className="font-medium text-white mb-2">Visual Elements:</div>
+            <div className="space-y-2 text-sm">
+              <div><strong>Large Circles:</strong> Computer systems and databases at each level</div>
+              <div><strong>Moving Dots:</strong> Data packets flowing between systems</div>
+              <div><strong>Color Changes:</strong> Data transformation as it moves up the pyramid</div>
+              <div><strong>Curved Paths:</strong> Network connections and data flow routes</div>
+            </div>
+          </div>
+
+          <div className="border-t border-slate-700 pt-3">
+            <div className="font-medium text-white mb-2">Real-World Context:</div>
+            <p className="text-sm text-slate-400">
+              This animation demonstrates how a single ore sample reading travels from field sensors 
+              through multiple information systems, getting processed and aggregated at each level to 
+              eventually inform executive decisions about mining operations.
+            </p>
           </div>
         </div>
       </div>

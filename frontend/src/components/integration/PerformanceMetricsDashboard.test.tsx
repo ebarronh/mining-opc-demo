@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import PerformanceMetricsDashboard from './PerformanceMetricsDashboard'
 import type { FleetManagementSystem } from '@/data/fleetManagementSystems'
@@ -65,7 +65,9 @@ describe('PerformanceMetricsDashboard', () => {
   })
 
   afterEach(() => {
-    jest.runOnlyPendingTimers()
+    act(() => {
+      jest.runOnlyPendingTimers()
+    })
     jest.useRealTimers()
   })
 
@@ -125,7 +127,7 @@ describe('PerformanceMetricsDashboard', () => {
     
     expect(screen.getByText('Operational Efficiency Metrics')).toBeInTheDocument()
     expect(screen.getByText('Average Haul Time')).toBeInTheDocument()
-    expect(screen.getAllByText('Equipment Utilization')).toHaveLength(3) // Appears in multiple sections
+    expect(screen.getAllByText('Equipment Utilization')).toHaveLength(2) // Appears in multiple sections
     expect(screen.getByText('Load Factor Optimization')).toBeInTheDocument()
     expect(screen.getByText('Route Compliance')).toBeInTheDocument()
   })

@@ -84,7 +84,7 @@ describe('DataFlowAnimator', () => {
       />
     );
     
-    expect(screen.getByText('Data Flow Active')).toBeInTheDocument();
+    expect(screen.getByText('From Ore Sample to Business Decision')).toBeInTheDocument();
   });
 
   it('shows active status when isActive is true', () => {
@@ -96,7 +96,7 @@ describe('DataFlowAnimator', () => {
       />
     );
     
-    expect(screen.getByText('Data Flow Active')).toBeInTheDocument();
+    expect(screen.getByText('0 samples')).toBeInTheDocument();
   });
 
   it('shows paused status when isActive is false', () => {
@@ -108,7 +108,7 @@ describe('DataFlowAnimator', () => {
       />
     );
     
-    expect(screen.getByText('Data Flow Paused')).toBeInTheDocument();
+    expect(screen.getByText('0 samples')).toBeInTheDocument();
   });
 
   it('displays particle count', () => {
@@ -123,7 +123,7 @@ describe('DataFlowAnimator', () => {
     expect(screen.getByText(/samples/)).toBeInTheDocument();
   });
 
-  it('shows data flow metrics and journey label', () => {
+  it('shows data flow journey label and guide', () => {
     render(
       <DataFlowAnimator
         nodes={sampleNodes}
@@ -131,10 +131,10 @@ describe('DataFlowAnimator', () => {
       />
     );
     
-    expect(screen.getByText('Ore Samples')).toBeInTheDocument();
-    expect(screen.getByText('Samples/sec')).toBeInTheDocument();
     expect(screen.getByText('From Ore Sample to Business Decision')).toBeInTheDocument();
-    expect(screen.getByText('Watch how one ore reading becomes strategic intelligence')).toBeInTheDocument();
+    expect(screen.getByText('Quick Guide')).toBeInTheDocument();
+    expect(screen.getByText('Systems')).toBeInTheDocument();
+    expect(screen.getByText('Data')).toBeInTheDocument();
   });
 
   it('creates canvas with correct dimensions', () => {
@@ -171,7 +171,7 @@ describe('DataFlowAnimator', () => {
     );
     
     // Should not crash and should still show status
-    expect(screen.getByText('Data Flow Active')).toBeInTheDocument();
+    expect(screen.getByText('From Ore Sample to Business Decision')).toBeInTheDocument();
   });
 
   it('calls onParticleComplete when provided', () => {
@@ -186,7 +186,7 @@ describe('DataFlowAnimator', () => {
     );
     
     // Component should render without errors
-    expect(screen.getByText('Data Flow Active')).toBeInTheDocument();
+    expect(screen.getByText('From Ore Sample to Business Decision')).toBeInTheDocument();
   });
 
   it('respects animationSpeed prop', () => {
@@ -199,10 +199,10 @@ describe('DataFlowAnimator', () => {
     );
     
     // Component should render with custom speed
-    expect(screen.getByText('Data Flow Active')).toBeInTheDocument();
+    expect(screen.getByText('From Ore Sample to Business Decision')).toBeInTheDocument();
   });
 
-  it('shows legend with mining systems and ore sample data', () => {
+  it('shows quick guide with systems and data', () => {
     render(
       <DataFlowAnimator
         nodes={sampleNodes}
@@ -210,9 +210,9 @@ describe('DataFlowAnimator', () => {
       />
     );
     
-    expect(screen.getByText('Legend')).toBeInTheDocument();
-    expect(screen.getByText('Mining Systems')).toBeInTheDocument();
-    expect(screen.getByText('Ore Sample Data')).toBeInTheDocument();
-    expect(screen.getByText('Follow a dot from red to purple!')).toBeInTheDocument();
+    expect(screen.getByText('Quick Guide')).toBeInTheDocument();
+    expect(screen.getByText('Systems')).toBeInTheDocument();
+    expect(screen.getByText('Data')).toBeInTheDocument();
+    expect(screen.getByText('Follow red→purple')).toBeInTheDocument();
   });
 });

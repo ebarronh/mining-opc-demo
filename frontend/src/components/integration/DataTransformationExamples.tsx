@@ -338,6 +338,8 @@ export const DataTransformationExamples: React.FC<DataTransformationExamplesProp
 }) => {
   const [expandedLevel, setExpandedLevel] = useState<number | null>(selectedLevel || 0);
   const [animatingData, setAnimatingData] = useState(false);
+  const [currentAnimationLevel, setCurrentAnimationLevel] = useState(-1);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     if (selectedLevel !== undefined) {
@@ -350,8 +352,30 @@ export const DataTransformationExamples: React.FC<DataTransformationExamplesProp
   };
 
   const animateDataFlow = () => {
+    if (isAnimating) return; // Prevent multiple animations
+    
+    setIsAnimating(true);
     setAnimatingData(true);
-    setTimeout(() => setAnimatingData(false), 3000);
+    setCurrentAnimationLevel(0);
+    
+    // Animate through each level sequentially
+    const animateNextLevel = (level: number) => {
+      if (level > 5) {
+        // Animation complete
+        setTimeout(() => {
+          setAnimatingData(false);
+          setCurrentAnimationLevel(-1);
+          setIsAnimating(false);
+        }, 500);
+        return;
+      }
+      
+      setCurrentAnimationLevel(level);
+      setExpandedLevel(level); // Auto-expand the current level
+      setTimeout(() => animateNextLevel(level + 1), 1500); // 1.5 seconds per level
+    };
+    
+    animateNextLevel(0);
   };
 
   return (
@@ -366,27 +390,50 @@ export const DataTransformationExamples: React.FC<DataTransformationExamplesProp
         </p>
         <button
           onClick={animateDataFlow}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors duration-200 flex items-center space-x-2 mx-auto"
+          disabled={isAnimating}
+          className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-colors duration-200 flex items-center space-x-2 mx-auto ${
+            isAnimating 
+              ? 'bg-gray-600 cursor-not-allowed' 
+              : 'bg-blue-600 hover:bg-blue-700'
+          }`}
         >
-          <Clock className="w-4 h-4" />
-          <span>Animate Data Flow</span>
+          <Clock className={`w-4 h-4 ${isAnimating ? 'animate-spin' : ''}`} />
+          <span>{isAnimating ? 'Animating...' : 'Animate Data Flow'}</span>
         </button>
+        
+        {/* Progress indicator */}
+        {isAnimating && (
+          <div className="mt-4 w-full max-w-md mx-auto">
+            <div className="flex justify-between text-xs text-slate-400 mb-1">
+              <span>Processing Level {currentAnimationLevel}</span>
+              <span>{currentAnimationLevel + 1}/6</span>
+            </div>
+            <div className="w-full bg-slate-700 rounded-full h-2">
+              <div 
+                className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${((currentAnimationLevel + 1) / 6) * 100}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Transformation Levels */}
       <div className="space-y-4">
         {DATA_TRANSFORMATIONS.map((transformation, index) => {
           const isExpanded = expandedLevel === transformation.level;
-          const isAnimating = animatingData && index <= (Date.now() % 6);
+          const isCurrentlyAnimating = currentAnimationLevel === transformation.level;
+          const hasBeenAnimated = animatingData && currentAnimationLevel > transformation.level;
           
           return (
             <div
               key={transformation.level}
               className={`
-                border rounded-lg transition-all duration-300
+                border rounded-lg transition-all duration-500
                 ${getLevelColor(transformation.level)}
                 ${isExpanded ? 'ring-2 ring-white/20' : ''}
-                ${isAnimating ? 'animate-pulse' : ''}
+                ${isCurrentlyAnimating ? 'ring-4 ring-blue-400 scale-105 shadow-2xl shadow-blue-500/20' : ''}
+                ${hasBeenAnimated ? 'opacity-70' : ''}
               `}
             >
               {/* Level Header */}
@@ -490,6 +537,17 @@ export const DataTransformationExamples: React.FC<DataTransformationExamplesProp
                         </div>
                       </div>
                     </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Data Flow Animation Between Levels */}
+              {isCurrentlyAnimating && transformation.level < 5 && (
+                <div className="flex justify-center py-2">
+                  <div className="flex flex-col items-center">
+                    <div className="w-1 h-8 bg-gradient-to-b from-blue-400 to-transparent animate-pulse"></div>
+                    <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce"></div>
+                    <div className="w-1 h-8 bg-gradient-to-t from-blue-400 to-transparent animate-pulse"></div>
                   </div>
                 </div>
               )}
