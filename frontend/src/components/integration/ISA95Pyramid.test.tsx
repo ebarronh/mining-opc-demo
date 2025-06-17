@@ -163,10 +163,10 @@ describe('ISA95Pyramid', () => {
       // Hover over the element should show tooltip content via CSS (opacity)
       fireEvent.mouseEnter(level0Element);
       
-      // The tooltip content should be in the DOM (even if hidden by CSS)
-      expect(screen.getByText(/Mining Context/)).toBeInTheDocument();
-      expect(screen.getByText(/Protocols/)).toBeInTheDocument();
-      expect(screen.getByText(/Metrics/)).toBeInTheDocument();
+      // The tooltip content should be in the DOM (even if hidden by CSS) - using getAllBy since tooltips duplicate text
+      expect(screen.getAllByText(/Mining Context/)).toHaveLength(6); // One for each level
+      expect(screen.getAllByText(/Protocols/)).toHaveLength(6);
+      expect(screen.getAllByText(/Metrics/)).toHaveLength(6);
     }
   });
 
