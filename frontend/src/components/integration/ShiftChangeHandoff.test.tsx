@@ -6,7 +6,7 @@ import ShiftChangeHandoff from './ShiftChangeHandoff';
 jest.mock('lucide-react', () => ({
   Clock: () => <div data-testid="clock-icon" />,
   Users: () => <div data-testid="users-icon" />,
-  FileTransfer: () => <div data-testid="file-transfer-icon" />,
+  FileText: () => <div data-testid="file-text-icon" />,
   AlertTriangle: () => <div data-testid="alert-triangle-icon" />,
   CheckCircle: () => <div data-testid="check-circle-icon" />,
   Timer: () => <div data-testid="timer-icon" />,
@@ -22,12 +22,9 @@ jest.mock('lucide-react', () => ({
   Target: () => <div data-testid="target-icon" />,
 }));
 
-// Mock timers for auto-update functionality
-jest.useFakeTimers();
-
 describe('ShiftChangeHandoff', () => {
   beforeEach(() => {
-    jest.clearAllTimers();
+    jest.useFakeTimers();
   });
 
   afterEach(() => {
