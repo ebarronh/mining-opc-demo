@@ -120,7 +120,7 @@ describe('DataFlowAnimator', () => {
       />
     );
     
-    expect(screen.getByText(/particles/)).toBeInTheDocument();
+    expect(screen.getByText(/samples/)).toBeInTheDocument();
   });
 
   it('shows data flow metrics and journey label', () => {
@@ -131,10 +131,10 @@ describe('DataFlowAnimator', () => {
       />
     );
     
-    expect(screen.getByText('Data Packets')).toBeInTheDocument();
-    expect(screen.getByText('Readings/sec')).toBeInTheDocument();
-    expect(screen.getByText('ISA-95 Data Journey')).toBeInTheDocument();
-    expect(screen.getByText('Watch ore readings flow through mining systems')).toBeInTheDocument();
+    expect(screen.getByText('Ore Samples')).toBeInTheDocument();
+    expect(screen.getByText('Samples/sec')).toBeInTheDocument();
+    expect(screen.getByText('From Ore Sample to Business Decision')).toBeInTheDocument();
+    expect(screen.getByText('Watch how one ore reading becomes strategic intelligence')).toBeInTheDocument();
   });
 
   it('creates canvas with correct dimensions', () => {
@@ -200,5 +200,19 @@ describe('DataFlowAnimator', () => {
     
     // Component should render with custom speed
     expect(screen.getByText('Data Flow Active')).toBeInTheDocument();
+  });
+
+  it('shows legend with mining systems and ore sample data', () => {
+    render(
+      <DataFlowAnimator
+        nodes={sampleNodes}
+        connections={sampleConnections}
+      />
+    );
+    
+    expect(screen.getByText('Legend')).toBeInTheDocument();
+    expect(screen.getByText('Mining Systems')).toBeInTheDocument();
+    expect(screen.getByText('Ore Sample Data')).toBeInTheDocument();
+    expect(screen.getByText('Follow a dot from red to purple!')).toBeInTheDocument();
   });
 });

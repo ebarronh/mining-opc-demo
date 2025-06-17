@@ -346,8 +346,8 @@ export const DataFlowAnimator: React.FC<DataFlowAnimatorProps> = ({
     <div className={`relative w-full h-full overflow-hidden ${className}`}>
       {/* Canvas Label */}
       <div className="absolute top-4 left-4 bg-slate-800/80 backdrop-blur rounded-lg px-3 py-2 z-10">
-        <div className="text-xs font-medium text-white mb-1">ISA-95 Data Journey</div>
-        <div className="text-xs text-slate-400">Watch ore readings flow through mining systems</div>
+        <div className="text-xs font-medium text-white mb-1">From Ore Sample to Business Decision</div>
+        <div className="text-xs text-slate-400">Watch how one ore reading becomes strategic intelligence</div>
       </div>
 
       <canvas
@@ -365,8 +365,26 @@ export const DataFlowAnimator: React.FC<DataFlowAnimatorProps> = ({
           {isActive ? 'Data Flow Active' : 'Data Flow Paused'}
         </span>
         <span className="text-xs text-slate-400">
-          {particles.length} particles
+          {particles.length} samples
         </span>
+      </div>
+
+      {/* Simple Legend */}
+      <div className="absolute bottom-4 right-4 bg-slate-800/80 backdrop-blur rounded-lg p-3 text-xs">
+        <div className="text-white font-medium mb-2">Legend</div>
+        <div className="space-y-1">
+          <div className="flex items-center space-x-2">
+            <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+            <span className="text-slate-300">Mining Systems</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+            <span className="text-slate-300">Ore Sample Data</span>
+          </div>
+        </div>
+        <div className="text-slate-400 text-xs mt-2">
+          Follow a dot from red to purple!
+        </div>
       </div>
 
       {/* Data Flow Metrics */}
@@ -376,41 +394,86 @@ export const DataFlowAnimator: React.FC<DataFlowAnimatorProps> = ({
           <div className="w-1 h-1 bg-blue-400 rounded-full animate-pulse"></div>
           <div className="group relative">
             <Info className="w-3 h-3 text-slate-400 hover:text-blue-400 cursor-help" />
-            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 w-80 p-3 bg-slate-900 border border-slate-600 rounded-lg text-xs text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none">
-              <div className="font-medium text-white mb-1">ISA-95 Data Flow Simulation</div>
-              <p className="mb-2">This animation shows how ore sensor data travels through mining systems. Each particle represents a data reading that:</p>
-              <div className="mb-2 p-2 bg-slate-800 rounded">
-                <p className="text-xs">• <strong>Starts RED</strong> as raw sensor reading from XRF analyzer</p>
-                <p className="text-xs">• <strong>Changes color</strong> as it gets processed through each ISA-95 level</p>
-                <p className="text-xs">• <strong>Ends PURPLE</strong> as strategic business insight</p>
+            <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 w-96 p-4 bg-slate-900 border border-slate-600 rounded-lg text-xs text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none shadow-2xl">
+              <div className="font-medium text-white mb-2">How Mining Data Becomes Business Intelligence</div>
+              
+              <div className="mb-3 p-3 bg-blue-500/10 border border-blue-500/30 rounded">
+                <div className="font-medium text-blue-300 mb-1">What You're Watching:</div>
+                <p className="text-xs text-blue-200">Each moving dot represents one ore sample reading (like "62.5% iron content") traveling through your mining operation's computer systems.</p>
               </div>
-              <div className="text-xs mb-2">
-                <div className="font-medium text-white mb-1">Color = Processing Level:</div>
-                <div className="grid grid-cols-2 gap-1">
-                  <div><span className="text-red-400">●</span> Field sensors</div>
-                  <div><span className="text-orange-400">●</span> Control systems</div>
-                  <div><span className="text-yellow-400">●</span> SCADA displays</div>
-                  <div><span className="text-green-400">●</span> Production planning</div>
-                  <div><span className="text-blue-400">●</span> Business systems</div>
-                  <div><span className="text-purple-400">●</span> Executive analytics</div>
+
+              <div className="mb-3">
+                <div className="font-medium text-white mb-2">The Journey (Follow One Dot):</div>
+                <div className="space-y-2">
+                  <div className="flex items-start space-x-2">
+                    <span className="text-red-400 text-lg">●</span>
+                    <div>
+                      <div className="font-medium text-red-300">Start: Ore Analyzer</div>
+                      <div className="text-xs text-slate-400">"Sample #1247: 62.5% Fe, 8.2% SiO2"</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-2">
+                    <span className="text-orange-400 text-lg">●</span>
+                    <div>
+                      <div className="font-medium text-orange-300">Control System</div>
+                      <div className="text-xs text-slate-400">"High grade detected - route to premium stockpile"</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-2">
+                    <span className="text-yellow-400 text-lg">●</span>
+                    <div>
+                      <div className="font-medium text-yellow-300">Operator Screen</div>
+                      <div className="text-xs text-slate-400">"Premium pile: +142 tons today"</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-2">
+                    <span className="text-green-400 text-lg">●</span>
+                    <div>
+                      <div className="font-medium text-green-300">Production Report</div>
+                      <div className="text-xs text-slate-400">"Daily average: 61.8% Fe (+2% vs target)"</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-2">
+                    <span className="text-blue-400 text-lg">●</span>
+                    <div>
+                      <div className="font-medium text-blue-300">Business System</div>
+                      <div className="text-xs text-slate-400">"Order premium rail cars for shipment"</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start space-x-2">
+                    <span className="text-purple-400 text-lg">●</span>
+                    <div>
+                      <div className="font-medium text-purple-300">Executive Dashboard</div>
+                      <div className="text-xs text-slate-400">"Premium ore margins up 8% this quarter"</div>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <p className="text-slate-400 text-xs">Watch a single ore reading become strategic intelligence!</p>
+
+              <div className="border-t border-slate-700 pt-2">
+                <div className="font-medium text-white mb-1">Big Circles = Computer Systems</div>
+                <p className="text-xs text-slate-400">Each large circle represents a different computer system in your mine (analyzers, controllers, displays, databases, etc.)</p>
+              </div>
             </div>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3 text-xs">
           <div>
             <div className="text-green-400 font-mono text-sm">{particles.length}</div>
-            <div className="text-slate-400">Data Packets</div>
-            <div className="text-slate-500 text-xs">in transit</div>
+            <div className="text-slate-400">Ore Samples</div>
+            <div className="text-slate-500 text-xs">being processed</div>
           </div>
           <div>
             <div className="text-blue-400 font-mono text-sm">
               {(particles.reduce((sum, p) => sum + (p.data?.value || 45), 0) / particles.length || 45).toFixed(0)}
             </div>
-            <div className="text-slate-400">Readings/sec</div>
-            <div className="text-slate-500 text-xs">avg rate</div>
+            <div className="text-slate-400">Samples/sec</div>
+            <div className="text-slate-500 text-xs">from analyzers</div>
           </div>
         </div>
       </div>
