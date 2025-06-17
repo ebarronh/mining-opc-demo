@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Clock, 
   Users, 
-  FileTransfer, 
+  FileText, 
   AlertTriangle, 
   CheckCircle, 
   Timer, 
@@ -254,7 +254,7 @@ export default function ShiftChangeHandoff() {
       case 'completed':
         return <CheckCircle className="w-4 h-4 text-green-500" />;
       case 'transferring':
-        return <FileTransfer className="w-4 h-4 text-blue-500 animate-pulse" />;
+        return <FileText className="w-4 h-4 text-blue-500 animate-pulse" />;
       case 'pending':
         return <Timer className="w-4 h-4 text-yellow-500" />;
       case 'failed':
@@ -410,7 +410,7 @@ export default function ShiftChangeHandoff() {
       {/* Handoff Progress Summary */}
       <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
         <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
-          <FileTransfer className="w-5 h-5" />
+          <FileText className="w-5 h-5" />
           Handoff Progress Summary
         </h3>
         
@@ -623,3 +623,5 @@ export default function ShiftChangeHandoff() {
     </div>
   );
 }
+
+export default ShiftChangeHandoff;

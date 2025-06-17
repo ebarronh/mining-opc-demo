@@ -93,7 +93,7 @@ export function VirtualizedTree({
     const searchLower = internalSearchQuery.toLowerCase();
     
     const flattenNode = (node: TreeNode, level: number = 0): void => {
-      const hasChildren = node.children && node.children.length > 0;
+      const hasChildren = Boolean(node.children && node.children.length > 0);
       const isExpanded = expandedNodes.has(node.id);
       
       // Check if node matches search
