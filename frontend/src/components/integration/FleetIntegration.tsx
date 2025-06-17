@@ -226,7 +226,13 @@ export default function FleetIntegration({ className = '' }: FleetIntegrationPro
       {/* Routing Tab */}
       {activeTab === 'routing' && (
         <div>
-          <TruckReroutingVisualization />
+          <TruckReroutingVisualization 
+            selectedVendor={{
+              vendor: selectedVendor.vendor,
+              color: selectedVendor.color,
+              name: selectedVendor.name
+            }}
+          />
         </div>
       )}
 
