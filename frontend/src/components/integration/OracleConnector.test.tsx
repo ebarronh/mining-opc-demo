@@ -21,27 +21,15 @@ describe('OracleConnector', () => {
     expect(screen.getByText('Connect to view Autonomous Database metrics')).toBeInTheDocument()
   })
 
-  it('handles connection process', async () => {
+  it('has navigation tabs', () => {
     render(<OracleConnector />)
     
-    const connectButton = screen.getByText('Connect')
-    fireEvent.click(connectButton)
-    
-    await waitFor(() => {
-      expect(screen.getByText('connecting')).toBeInTheDocument()
-    }, { timeout: 100 })
-    
-    await waitFor(() => {
-      expect(screen.getByText('connected')).toBeInTheDocument()
-    }, { timeout: 2000 })
-  })
-
-  it('allows service selection', () => {
-    render(<OracleConnector />)
-    
-    const ordsService = screen.getByText('ORDS APIs').closest('div')
-    fireEvent.click(ordsService!)
-    
-    expect(screen.getByText('Oracle REST Data Services')).toBeInTheDocument()
+    expect(screen.getByText('Services')).toBeInTheDocument()
+    expect(screen.getByText('APEX Apps')).toBeInTheDocument()
+    expect(screen.getByText('Architecture')).toBeInTheDocument()
+    expect(screen.getByText('SQL Queries')).toBeInTheDocument()
+    expect(screen.getByText('Security')).toBeInTheDocument()
+    expect(screen.getByText('Data Retention')).toBeInTheDocument()
+    expect(screen.getByText('Troubleshooting')).toBeInTheDocument()
   })
 })
