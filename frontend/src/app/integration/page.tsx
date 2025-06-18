@@ -1,6 +1,7 @@
 import { AppLayout } from '@/components/layout/AppLayout'
 import ISA95Pyramid from '@/components/integration/ISA95Pyramid'
 import FleetIntegration from '@/components/integration/FleetIntegration'
+import OracleConnector from '@/components/integration/OracleConnector'
 import { Building2, BarChart3, Workflow } from 'lucide-react'
 import type { Metadata } from 'next'
 
@@ -44,29 +45,9 @@ export default function IntegrationPage() {
           <FleetIntegration />
         </div>
 
-        {/* Task 3.0: Oracle Cloud Integration */}
-        <div className="bg-slate-800 border border-slate-600 rounded-xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-3">
-              <BarChart3 className="w-5 h-5 text-red-400" />
-              <h3 className="text-lg font-semibold text-white">Oracle Cloud</h3>
-            </div>
-            <span className="px-2 py-1 bg-yellow-500/20 border border-yellow-500/30 rounded text-xs text-yellow-300">
-              Task 3.0
-            </span>
-          </div>
-          <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 mb-4 h-32 flex items-center justify-center">
-            <div className="text-center">
-              <BarChart3 className="w-8 h-8 text-slate-600 mx-auto mb-2" />
-              <p className="text-slate-500 text-xs">OracleConnector Component</p>
-              <p className="text-slate-600 text-xs mt-1">Coming in Phase 5.3</p>
-            </div>
-          </div>
-          <ul className="space-y-1 text-xs text-slate-400">
-            <li>• Autonomous Database visualization</li>
-            <li>• ORDS API endpoint demonstrations</li>
-            <li>• Oracle APEX low-code examples</li>
-          </ul>
+        {/* Task 3.0: Oracle Cloud Integration - ACTIVE */}
+        <div className="lg:col-span-2 xl:col-span-3">
+          <OracleConnector />
         </div>
 
         {/* Task 4.0: Delta Share Protocol */}

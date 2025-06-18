@@ -1,7 +1,7 @@
 export interface MiningTerm {
   term: string;
   definition: string;
-  category: 'equipment' | 'process' | 'measurement' | 'safety' | 'geology' | 'technology';
+  category: 'equipment' | 'process' | 'measurement' | 'safety' | 'geology' | 'technology' | 'cloud';
   relatedTerms?: string[];
   example?: string;
   unit?: string;
@@ -231,6 +231,50 @@ export const miningTerms: Record<string, MiningTerm> = {
     category: 'technology',
     relatedTerms: ['MES', 'ERP', 'integration'],
     example: 'OPC UA data flows from Level 1 devices up to Level 4 ERP systems.'
+  },
+
+  // Cloud Integration Terms
+  'autonomous database': {
+    term: 'Autonomous Database',
+    definition: 'Self-managing Oracle database service that automatically tunes, patches, and scales itself. Eliminates database administration overhead for mining operations.',
+    category: 'cloud',
+    relatedTerms: ['Oracle Cloud', 'auto-scaling', 'ORDS'],
+    example: 'Autonomous Database automatically scales compute resources during monthly ore reporting periods.'
+  },
+  'ords': {
+    term: 'ORDS',
+    definition: 'Oracle REST Data Services - Middleware for accessing Oracle databases via RESTful APIs. Enables web and mobile applications to securely access mining data.',
+    category: 'cloud',
+    relatedTerms: ['REST API', 'Autonomous Database', 'JSON'],
+    example: 'ORDS endpoint /api/ore-grades returns JSON data for grade visualization dashboards.'
+  },
+  'oracle apex': {
+    term: 'Oracle APEX',
+    definition: 'Low-code development platform for building mining applications quickly. Enables rapid creation of shift dashboards and maintenance interfaces.',
+    category: 'cloud',
+    relatedTerms: ['low-code', 'web application', 'dashboard'],
+    example: 'APEX applications provide shift supervisors with real-time equipment status and production metrics.'
+  },
+  'oci functions': {
+    term: 'OCI Functions',
+    definition: 'Oracle\'s serverless computing platform for event-driven processing. Automatically scales to handle variable mining workloads without server management.',
+    category: 'cloud',
+    relatedTerms: ['serverless', 'auto-scaling', 'event-driven'],
+    example: 'OCI Functions process grade alerts and equipment notifications automatically as they occur.'
+  },
+  'analytics cloud': {
+    term: 'Oracle Analytics Cloud',
+    definition: 'Business intelligence platform for creating interactive dashboards and reports from mining data. Provides self-service analytics capabilities.',
+    category: 'cloud',
+    relatedTerms: ['BI', 'dashboard', 'visualization'],
+    example: 'Analytics Cloud dashboards show production KPIs, equipment utilization, and grade analysis trends.'
+  },
+  'auto-scaling': {
+    term: 'Auto-scaling',
+    definition: 'Cloud capability that automatically adjusts computing resources based on demand. Critical for handling variable mining data loads.',
+    category: 'cloud',
+    relatedTerms: ['elasticity', 'compute resources', 'cost optimization'],
+    example: 'During end-of-shift reporting, auto-scaling increases database capacity to handle peak query loads.'
   }
 };
 
